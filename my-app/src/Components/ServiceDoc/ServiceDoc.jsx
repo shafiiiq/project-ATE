@@ -1,27 +1,42 @@
-import React from "react";
-import "./ServiceDoc.css";
+'use client';
+import React, { useEffect, useState } from 'react';
+import './ServiceDoc.css';
+import equipments from '../../equipments';
 import logoImage from '../../assets/images/al-ansari.png';
+import sign from '../../assets/images/sign.jpg';
 
 const ServiceDoc = () => {
+  const [filteredData, setFilteredData] = useState(equipments);
+  const [remarks, setRemarks] = useState('');
+  const [serviceHrs, setServiceHrs] = useState('');
+  const [equipmentNo, setEquipmentNo] = useState('');
+  const [nextServiceHrs, setNextServiceHrs] = useState('');
+  const [machine, setMachine] = useState('');
+  const [mechanics, setMechanics] = useState('');
+  const [location, setLocation] = useState('');
+  const [date, setDate] = useState('');
+  const [operatorName, setOperatorName] = useState('');
+  const [mechanicSign, setMechanicSign] = useState('');
+
   const handlePrint = () => {
     window.print();
   };
 
-  async function correctText(text) {
-    const response = await fetch("https://api.languagetoolplus.com/v2/check", {
-      method: "POST",
+  const correctText = async (text) => {
+    const response = await fetch('https://api.languagetoolplus.com/v2/check', {
+      method: 'POST',
       headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
+        'Content-Type': 'application/x-www-form-urlencoded',
       },
       body: new URLSearchParams({
         text,
-        language: "en-US",
+        language: 'en-US',
       }),
     });
-  
+
     const result = await response.json();
     let corrected = text;
-  
+
     for (const match of result.matches.reverse()) {
       if (match.replacements.length > 0) {
         const replacement = match.replacements[0].value;
@@ -31,13 +46,9 @@ const ServiceDoc = () => {
           corrected.slice(match.offset + match.length);
       }
     }
-  
+
     return corrected;
-  }
-  
-  // Example usage
-  correctText("you and i are good boyss").then(console.log);
-  
+  };
 
   const formatText = (text) => {
     return text
@@ -45,19 +56,26 @@ const ServiceDoc = () => {
       .replace(/(^\w|\.\s*\w|\bi\b)/g, (match) => match.toUpperCase());
   };
 
-  const remarks = formatText("you and i are good boys");
-  const serviceHrs = formatText("250");
-  const equipmentNo = formatText("eq-9087");
-  const nextServiceHrs = formatText("500");
-  const machine = formatText("cat-320d");
-  const mechanics = formatText("john doe");
-  const location = formatText("doha yard");
-  const date = formatText("2025-04-13");
-  const operatorName = formatText("ali khan");
-  const mechanicSign = formatText("signed by john");
-  const supervisor = formatText("supervisor ahmed");
+  useEffect(() => {
+    const initializeData = async () => {
+      setServiceHrs(formatText('7497'));
+      setNextServiceHrs(formatText('7897'));
+      setMechanics(formatText('Faisal, Sambath'));
+      setDate(formatText('14/04/25'));
+      // setMechanicSign(formatText(''));
+      setEquipmentNo(formatText('7057'));
+      setMachine(formatText('Skid loader'));
+      setLocation('RLPP1');
+      setOperatorName(formatText('Sarban keshy'));
 
-  const ifCheck = false
+      const correctedRemarks = await correctText(formatText('Engine oil changed, Oil filter changed'));
+      setRemarks(correctedRemarks);
+    };
+
+    initializeData();
+  }, []);
+
+  const ifCheck = false;
 
   return (
     <>
@@ -69,22 +87,16 @@ const ServiceDoc = () => {
           <div className="logo-placeholder">
             <img src={logoImage} alt="Company Logo" />
           </div>
-          <div className="company-details">
-            <div className="company-name">
-              AI Ansari Transport & Enterprises W.L.L
-            </div>
-            <div>
-              Office No.2 Floor No.1 Gate No.3 Town Centre
-            </div>
-            <div>
-              Bin Omran, Doha, Qatar, P.O BOX-1265
-            </div>
-            <div className="contract-wrap">
-              <div className="phone">
+          <div className="company-details-s">
+            <div className="company-name-s">AI Ansari Transport & Enterprises W.L.L</div>
+            <div>Office No.2 Floor No.1 Gate No.3 Town Centre</div>
+            <div>Bin Omran, Doha, Qatar, P.O BOX-1265</div>
+            <div className="contract-wrap-s">
+              <div className="phone-s">
                 <span>Tel: +974 44505 700/800</span>
                 <span>Fax: +974 44505 900</span>
               </div>
-              <div className="email">
+              <div className="email-s">
                 <span>info@ansarigroup.co</span>
                 <span>www.ansarigroup.co</span>
               </div>
@@ -92,7 +104,7 @@ const ServiceDoc = () => {
           </div>
         </div>
 
-        <table className="checklist-table">
+        <table className="checklist-table-s">
           <thead>
             <tr>
               <th colSpan="6" className="heading">PERIODIC SERVICE REPORT</th>
@@ -113,7 +125,7 @@ const ServiceDoc = () => {
               <td>Change Engine oil & Filter</td>
               <td>✓</td>
               <td>25</td>
-              <td>Check Number Plate both</td>
+              <td>Check Silencer</td>
               <td></td>
             </tr>
             <tr>
@@ -121,7 +133,7 @@ const ServiceDoc = () => {
               <td>Change Fuel Filter</td>
               <td>✓</td>
               <td>26</td>
-              <td>Check Paint</td>
+              <td>Replace Hydraulic Oil- Filter</td>
               <td></td>
             </tr>
             <tr>
@@ -129,7 +141,7 @@ const ServiceDoc = () => {
               <td>{ifCheck ? "Check/Change Air Filter" : "Clean/Change Air Filter"}</td>
               <td>✓</td>
               <td>27</td>
-              <td>Check Tires</td>
+              <td>Replace Transmission Oil</td>
               <td></td>
             </tr>
             <tr>
@@ -137,7 +149,7 @@ const ServiceDoc = () => {
               <td>Check Transmission Filter</td>
               <td>✓</td>
               <td>28</td>
-              <td>Check Silencer</td>
+              <td>Replace Differential Oil</td>
               <td></td>
             </tr>
             <tr>
@@ -145,7 +157,7 @@ const ServiceDoc = () => {
               <td>Check Power Steering Oil</td>
               <td>✓</td>
               <td>29</td>
-              <td>Replace Hydraulic Oil- Filter</td>
+              <td>Replace Steering Box Oil</td>
               <td></td>
             </tr>
             <tr>
@@ -153,7 +165,7 @@ const ServiceDoc = () => {
               <td>Check Hydraulic Oil</td>
               <td>✓</td>
               <td>30</td>
-              <td>Replace Transmission Oil</td>
+              <td>Check Engine Valve Clearence</td>
               <td></td>
             </tr>
             <tr>
@@ -161,7 +173,7 @@ const ServiceDoc = () => {
               <td>Check Brake</td>
               <td>✓</td>
               <td>31</td>
-              <td>Replace Differential Oil</td>
+              <td>Replace clutch fluid</td>
               <td></td>
             </tr>
             <tr>
@@ -169,7 +181,7 @@ const ServiceDoc = () => {
               <td>Check Tyre Air Pressure</td>
               <td>✓</td>
               <td>32</td>
-              <td>Replace Steering Box Oil</td>
+              <td>Check Brake Lining</td>
               <td></td>
             </tr>
             <tr>
@@ -177,7 +189,7 @@ const ServiceDoc = () => {
               <td>Check Oil Leak</td>
               <td>✓</td>
               <td>33</td>
-              <td>Check Engine Valve Clearance</td>
+              <td>Change Drive Belt</td>
               <td></td>
             </tr>
             <tr>
@@ -230,7 +242,7 @@ const ServiceDoc = () => {
             </tr>
             <tr>
               <td>16</td>
-              <td>Check Battery Condition</td>
+              <td>Check Rod Water & Hoses</td>
               <td>✓</td>
               <td></td>
               <td></td>
@@ -246,7 +258,7 @@ const ServiceDoc = () => {
             </tr>
             <tr>
               <td>18</td>
-              <td>Check Clutch System</td>
+              <td>Check Gear Shift System</td>
               <td>✓</td>
               <td></td>
               <td></td>
@@ -254,7 +266,7 @@ const ServiceDoc = () => {
             </tr>
             <tr>
               <td>19</td>
-              <td>Check Wheel Nut</td>
+              <td>Check Clutch System</td>
               <td>✓</td>
               <td></td>
               <td></td>
@@ -262,7 +274,7 @@ const ServiceDoc = () => {
             </tr>
             <tr>
               <td>20</td>
-              <td>Check Battery Condition</td>
+              <td>Check Wheel Nut</td>
               <td>✓</td>
               <td></td>
               <td></td>
@@ -333,9 +345,11 @@ const ServiceDoc = () => {
               <td colSpan="3"><strong>DATE:</strong> {date}</td>
               <td colSpan="3"><strong>OPERATOR NAME:</strong> {operatorName}</td>
             </tr>
-            <tr>
+            <tr className='sign-table'>
               <td colSpan="3"><strong>MECHANIC SIGN:</strong> {mechanicSign}</td>
-              <td colSpan="3"><strong>SUPERVISOR SIGN:</strong> {supervisor}</td>
+              <td colSpan="3"><strong>SUPERVISOR SIGN:</strong>
+                <img className='sign' src={sign} alt="" />
+              </td>
             </tr>
           </tbody>
         </table>

@@ -2,6 +2,7 @@
 
 * {
   font-family: 'Poppins', sans-serif;
+  /* font-size: 12px; */
 }
 
 body {
@@ -36,14 +37,16 @@ body {
 }
 
 .report-container {
-  padding: 20px;
+  padding: 10px;
   font-family: 'Poppins', sans-serif;
   font-size: 12px;
-  width: 210mm;
+  width: 220mm;
+  height: 326mm;
   margin: 0 auto;
   background-color: white;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  /* box-shadow: 0 -4px 4px -2px rgba(0, 0, 0, 0.1); */
   box-sizing: border-box;
+  margin-bottom: 30px;
 }
 
 .checklist-table-s {
@@ -54,8 +57,11 @@ body {
 .checklist-table-s th,
 .checklist-table-s td {
   border: 1px solid black;
-  padding: 4px;
   vertical-align: top;
+}
+
+.checklist-table-s td {
+  padding: 6px 4px;
 }
 
 .checklist-table-s .heading {

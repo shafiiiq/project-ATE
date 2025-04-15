@@ -1,9 +1,14 @@
 'use client';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './ServiceForm.css';
 import equipments from '../../equipments';
+import { ServiceReportContext } from '../../App';
 
-const ServiceForm = ({ onSubmit, initialData = {} }) => {
+const ServiceForm = ({ initialData = {} }) => {
+  const navigate = useNavigate();
+  const { setServiceReportData } = useContext(ServiceReportContext);
+  
   // Form data state
   const [formData, setFormData] = useState({
     serviceHrs: initialData.serviceHrs || '',
@@ -54,6 +59,15 @@ const ServiceForm = ({ onSubmit, initialData = {} }) => {
     { id: 33, description: 'Change Drive Belt', status: '' },
   ]);
 
+  // Service history items with their status
+  const [serviceHistoryItems, setServiceHistoryItems] = useState([
+    { id: 1, description: 'Oil', status: '' },
+    { id: 2, description: 'Oil Filter', status: '' },
+    { id: 3, description: 'Fuel Filter', status: '' },
+    { id: 4, description: 'Water Seperator', status: '' },
+    { id: 5, description: 'Air Filter', status: '' },
+  ]);
+
   // Log formData whenever it changes
   useEffect(() => {
     console.log('Form Data Updated:', formData);
@@ -63,6 +77,11 @@ const ServiceForm = ({ onSubmit, initialData = {} }) => {
   useEffect(() => {
     console.log('Checklist Items Updated:', checklistItems);
   }, [checklistItems]);
+
+  // Log serviceHistoryItems whenever they change
+  useEffect(() => {
+    console.log('Service History Items Updated:', serviceHistoryItems);
+  }, [serviceHistoryItems]);
 
   // Auto-fill fields when equipment number changes
   useEffect(() => {
@@ -108,6 +127,15 @@ const ServiceForm = ({ onSubmit, initialData = {} }) => {
     );
   };
 
+  // Handle status change for individual service history item
+  const handleServiceHistoryStatusChange = (id, status) => {
+    setServiceHistoryItems(
+      serviceHistoryItems.map(item => 
+        item.id === id ? { ...item, status } : item
+      )
+    );
+  };
+
   // Handle "Check All" functions for specific range
   const checkAllInRange = (startId, endId, status) => {
     setChecklistItems(
@@ -117,19 +145,32 @@ const ServiceForm = ({ onSubmit, initialData = {} }) => {
     );
   };
 
+  // Handle "Check All" for service history items
+  const checkAllServiceHistory = (status) => {
+    setServiceHistoryItems(
+      serviceHistoryItems.map(item => ({ ...item, status }))
+    );
+  };
+
   // Handle form submission
   const handleSubmit = (e) => {
     e.preventDefault();
     
     // Create complete data object
-    const completeData = { ...formData, checklistItems };
+    const completeData = { 
+      ...formData, 
+      checklistItems,
+      serviceHistoryItems 
+    };
     
     // Log the complete data being submitted
     console.log('Form Submitted with Data:', completeData);
     
-    if (onSubmit) {
-      onSubmit(completeData);
-    }
+    // Update the context with the service report data
+    setServiceReportData(completeData);
+    
+    // Navigate to the ServiceDoc page
+    navigate('/service-doc');
   };
 
   // Format text function
@@ -433,6 +474,91 @@ const ServiceForm = ({ onSubmit, initialData = {} }) => {
               onChange={handleInputChange}
               rows="4"
             ></textarea>
+          </div>
+        </div>
+
+        <div className="form-section">
+          <h4>Service History</h4>
+          <div className="checklist-container">
+            <div className="checklist-column">
+              <div className="section-header">
+                <h5>Replaced Items</h5>
+                <div className="check-all-controls">
+                  <button 
+                    type="button" 
+                    className="check-all-button check-yes"
+                    onClick={() => checkAllServiceHistory('✓')}
+                  >
+                    Check All ✓
+                  </button>
+                  <button 
+                    type="button" 
+                    className="check-all-button check-no"
+                    onClick={() => checkAllServiceHistory('✗')}
+                  >
+                    Check All ✗
+                  </button>
+                  <button 
+                    type="button" 
+                    className="check-all-button check-na"
+                    onClick={() => checkAllServiceHistory('--')}
+                  >
+                    Check All --
+                  </button>
+                </div>
+              </div>
+              
+              <table className="checklist-table">
+                <thead>
+                  <tr>
+                    <th>No</th>
+                    <th>Description</th>
+                    <th colSpan="3">Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {serviceHistoryItems.map((item) => (
+                    <tr key={item.id}>
+                      <td>{item.id}</td>
+                      <td>{item.description}</td>
+                      <td className="status-cell">
+                        <label className="status-label">
+                          <input
+                            type="radio"
+                            name={`service-history-${item.id}`}
+                            checked={item.status === '✓'}
+                            onChange={() => handleServiceHistoryStatusChange(item.id, '✓')}
+                          />
+                          <span className="status-mark status-yes">✓</span>
+                        </label>
+                      </td>
+                      <td className="status-cell">
+                        <label className="status-label">
+                          <input
+                            type="radio"
+                            name={`service-history-${item.id}`}
+                            checked={item.status === '✗'}
+                            onChange={() => handleServiceHistoryStatusChange(item.id, '✗')}
+                          />
+                          <span className="status-mark status-no">✗</span>
+                        </label>
+                      </td>
+                      <td className="status-cell">
+                        <label className="status-label">
+                          <input
+                            type="radio"
+                            name={`service-history-${item.id}`}
+                            checked={item.status === '--'}
+                            onChange={() => handleServiceHistoryStatusChange(item.id, '--')}
+                          />
+                          <span className="status-mark status-na">--</span>
+                        </label>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
 

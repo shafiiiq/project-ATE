@@ -1,48 +1,45 @@
 /* Table.css */
 
 .container {
-    width: 100vw;
-    /* max-width: 1200px; */
-    /* margin: 0 auto; */
-    padding: 70px 40px;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
 }
 
 .title {
-    text-align: center;
-    margin-bottom: 20px;
     font-size: 44px;
-    font-weight: bold;
+    text-align: center;
+    margin-bottom: 10px;
 }
 
 .equipment {
+    text-align: center;
+    margin-bottom: 20px;
     font-size: 26px;
-    margin-bottom: 50px;
+    color: #555;
 }
 
 .controls-container {
     display: flex;
     justify-content: space-between;
+    margin-bottom: 20px;
     align-items: center;
-    margin-bottom: 15px;
-    flex-wrap: wrap;
-    gap: 10px;
-    width: 100%;
 }
 
-/* Search control styles */
 .search-container {
     position: relative;
-    flex-grow: 1;
+    flex: 1;
     max-width: 400px;
 }
 
 .search-input {
     width: 100%;
-    padding: 10px 30px 10px 10px;
+    padding: 10px 35px 10px 10px;
     border: 1px solid #ddd;
     border-radius: 4px;
-    font-size: 14px;
+    font-size: 16px;
 }
+
 
 .search-input:focus {
     outline: none;
@@ -52,21 +49,15 @@
 
 .clear-button {
     position: absolute;
-    right: 10px;
+    right: 8px;
     top: 50%;
     transform: translateY(-50%);
     background: none;
     border: none;
-    font-size: 18px;
-    color: #777;
+    font-size: 20px;
+    color: #999;
     cursor: pointer;
-    padding: 0;
-    width: 20px;
-    height: 20px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
+  }
 
 .clear-button:hover {
     color: #333;
@@ -87,6 +78,11 @@
 .print-button:hover {
     background-color: #45a049;
 }
+
+.action-buttons {
+    display: flex;
+    gap: 10px;
+  }
 
 .table-container {
     overflow-x: auto;
@@ -222,4 +218,85 @@
         font-size: 13px;
         align-self: flex-end;
     }
+}
+
+
+.print-button, .add-button {
+  padding: 10px 20px;
+  background-color: #4a90e2;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.3s;
+}
+
+.print-button:hover {
+  background-color: #357abf;
+}
+
+.add-button {
+  background-color: #4caf50;
+}
+
+.add-button:hover {
+  background-color: #45a049;
+}
+
+.table-info {
+  margin-bottom: 10px;
+  color: #555;
+}
+
+.table-container {
+  overflow-x: auto;
+}
+
+.equipment-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+.equipment-table th, 
+.equipment-table td {
+  border: 1px solid #ddd;
+  padding: 10px;
+  text-align: center;
+}
+
+.equipment-table th {
+  background-color: #f2f2f2;
+  position: sticky;
+  top: 0;
+}
+
+.equipment-table tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+.equipment-table tr:hover {
+  background-color: #f0f0f0;
+}
+
+.no-results {
+  font-style: italic;
+  color: #888;
+}
+
+@media (max-width: 768px) {
+  .controls-container {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .search-container {
+    max-width: 100%;
+    margin-bottom: 10px;
+  }
+  
+  .action-buttons {
+    justify-content: space-between;
+  }
 }

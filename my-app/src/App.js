@@ -5,6 +5,7 @@ import ServiceDoc from './Components/ServiceDoc/ServiceDoc';
 import ServiceForm from './Components/ServiceForm/ServiceForm';
 import Equipments from './Components/Equipments/Equipments';
 import ServiceHistory from './Components/ServiceHistory/ServiceHistory';
+import ServiceHistoryForm from './Components/ServiceHistoryForm/ServiceHistoryForm';
 
 // Create a context to share service report data between components
 export const ServiceReportContext = createContext();
@@ -22,6 +23,8 @@ function App() {
           <Route path="/service-form" element={<ServiceForm />} />
           <Route path="/equipments" element={<Equipments />} />
           <Route path="/service-history" element={<ServiceHistory />} />
+          <Route path="/service-history/:regNo" element={<ServiceHistory />} />
+          <Route path="/service-history-form/:regNo" element={<ServiceHistoryForm />} />
         </Routes>
       </Router>
     </ServiceReportContext.Provider>

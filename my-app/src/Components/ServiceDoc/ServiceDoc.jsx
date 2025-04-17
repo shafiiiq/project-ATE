@@ -58,17 +58,17 @@ const ServiceDoc = () => {
 
   useEffect(() => {
     const initializeData = async () => {
-      setServiceHrs(formatText('4633'));
-      setNextServiceHrs(formatText('5033'));
-      setMechanics('Sanil, Ansari');
-      setDate(formatText('15/04/25'));
+      setServiceHrs(formatText('170'));
+      setNextServiceHrs(formatText('800'));
+      setMechanics('Jaidha Machanic');
+      setDate(formatText('16/04/25'));
       // setMechanicSign(formatText(''));
-      setEquipmentNo(formatText('75866'));
-      setMachine(formatText('80Ton Crane'));
-      setLocation('Workshop');
-      setOperatorName('Muhammed Ikram');
+      setEquipmentNo(formatText('105113'));
+      setMachine(formatText('Bhoom Truck'));
+      setLocation('Jaidha');
+      setOperatorName('Abid');
 
-      const correctedRemarks =  ('Engine oil changed, Oil filter changed(24ltr), 2 fuel filter and water seperator changed, Bhoom greasing, Air filter Cleaning');
+      const correctedRemarks =  ('Engine oil changed, Oil filter changed(First free service)');
       // const correctedRemarks = await correctText(formatText('Engine oil changed, Oil filter changed(24ltr), 2 fuel filter and water seperator changed, Bhoom greasing, Air filter Cleaning'));
       setRemarks(correctedRemarks);
     };

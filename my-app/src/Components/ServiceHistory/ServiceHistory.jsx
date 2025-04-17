@@ -1,26 +1,64 @@
 import { useState, useRef, useEffect } from 'react';
 import './ServiceHistory.css';
 import serviceHistory from '../../service-history';
+import { useParams, useNavigate } from 'react-router-dom';
 
 function ServiceHistory() {
+  // Get the regNo from URL parameters and setup navigation
+  const { regNo } = useParams();
+  const navigate = useNavigate();
+
   // State for search functionality
   const [searchTerm, setSearchTerm] = useState('');
-  const [filteredData, setFilteredData] = useState(serviceHistory);
+  const [filteredData, setFilteredData] = useState([]);
+  const [equipmentData, setEquipmentData] = useState(null);
 
   // Create a ref for the table to print
   const tableRef = useRef(null);
 
-  // Filter data when search term changes
+  // Filter and sort service history data based on regNo and search term
   useEffect(() => {
-    const results = serviceHistory.filter(item => {
-      // Convert all values to strings and search in every field
+    // Log the registration number to console
+    console.log("Registration Number:", regNo);
+
+    // Filter service history for this specific equipment
+    let equipmentServiceHistory = serviceHistory.filter(item => 
+      item.regNo.trim() === regNo?.trim() || 
+      (item.equipmentId && item.equipmentId.trim() === regNo?.trim())
+    );
+
+    // Sort by date (newest first)
+    equipmentServiceHistory.sort((a, b) => {
+      return new Date(b.date) - new Date(a.date);
+    });
+
+    console.log("Filtered service history:", equipmentServiceHistory);
+
+    // Apply search term filter if any
+    const results = equipmentServiceHistory.filter(item => {
+      if (!searchTerm) return true;
       return Object.values(item).some(value =>
         String(value).toLowerCase().includes(searchTerm.toLowerCase())
       );
     });
 
     setFilteredData(results);
-  }, [searchTerm]);
+
+    // Try to find equipment details from your equipments data
+    if (regNo) {
+      import('../../equipments').then(module => {
+        const equipment = module.default.find(eq => eq.regNo.trim() === regNo.trim());
+        setEquipmentData(equipment);
+      }).catch(err => {
+        console.error("Could not load equipment data:", err);
+      });
+    }
+  }, [regNo, searchTerm]);
+
+  // Navigate to add service form
+  const handleAddService = () => {
+    navigate(`/service-history-form/${regNo}`);
+  };
 
   // Handle search input change
   const handleSearchChange = (e) => {
@@ -50,11 +88,12 @@ function ServiceHistory() {
     const content = `
       <html>
         <head>
-          <title>Equipment Inventory</title>
+          <title>Service History</title>
           ${style}
         </head>
         <body>
-          <h1>Equipment Inventory</h1>
+          <h1>Service History</h1>
+          <h2>${equipmentData ? `${equipmentData.machine} - ${regNo}` : `Equipment: ${regNo}`}</h2>
           ${searchTerm ? `<p>Search results for: "<strong>${searchTerm}</strong>"</p>` : ''}
           ${tableRef.current?.outerHTML}
           <div style="margin-top: 10px; text-align: center;">
@@ -79,14 +118,18 @@ function ServiceHistory() {
 
   return (
     <div className="container">
-
       <h1 className="title">Service History</h1>
-      <h3 className="equipment">Boom Truck - 534534</h3>
+      <h3 className="equipment">
+        {equipmentData 
+          ? `${equipmentData.machine} - ${regNo}`
+          : `Equipment: ${regNo}`}
+      </h3>
+
       <div className="controls-container">
         <div className="search-container">
           <input
             type="text"
-            placeholder="Search equipment..."
+            placeholder="Search service history..."
             value={searchTerm}
             onChange={handleSearchChange}
             className="search-input"
@@ -97,19 +140,22 @@ function ServiceHistory() {
             </button>
           )}
         </div>
-        <button onClick={handlePrint} className="print-button">
-          Print Table
-        </button>
+        <div className="action-buttons">
+          <button onClick={handleAddService} className="add-button">
+            Add Service
+          </button>
+          <button onClick={handlePrint} className="print-button">
+            Print Table
+          </button>
+        </div>
       </div>
       <div className="table-info">
         {searchTerm ? (
           `Found ${filteredData.length} matching ${filteredData.length === 1 ? 'entry' : 'entries'}`
         ) : (
-          `Showing all ${filteredData.length} entries`
+          `Showing ${filteredData.length} ${filteredData.length === 1 ? 'entry' : 'entries'} `
         )}
       </div>
-
-    
 
       <div className="table-container">
         <table className="equipment-table" ref={tableRef}>
@@ -119,7 +165,7 @@ function ServiceHistory() {
               <th>Oil</th>
               <th>Oil Filter</th>
               <th>Fuel Filter</th>
-              <th>Water Seperator</th>
+              <th>Water Separator</th>
               <th>Air Filter</th>
               <th>Serviced Hrs</th>
               <th>Next Service Hrs</th>
@@ -127,8 +173,8 @@ function ServiceHistory() {
           </thead>
           <tbody>
             {filteredData.length > 0 ? (
-              filteredData.map((item) => (
-                <tr key={item.id}>
+              filteredData.map((item, index) => (
+                <tr key={index}>
                   <td>{item.date}</td>
                   <td>{item.oil}</td>
                   <td>{item.oilFilter}</td>
@@ -141,14 +187,12 @@ function ServiceHistory() {
               ))
             ) : (
               <tr>
-                <td colSpan="10" className="no-results">No matching records found</td>
+                <td colSpan="8" className="no-results">No service history records found for this equipment</td>
               </tr>
             )}
           </tbody>
         </table>
       </div>
-
-     
     </div>
   );
 }

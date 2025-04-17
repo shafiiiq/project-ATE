@@ -1,11 +1,13 @@
 import { useState, useRef, useEffect } from 'react';
 import './Equipments.css';
 import equipments from '../../equipments';
+import { useNavigate } from 'react-router-dom';
 
 function Equipments() {
   // State for search functionality
   const [searchTerm, setSearchTerm] = useState('');
   const [filteredData, setFilteredData] = useState(equipments);
+  const navigate = useNavigate();
 
   // Create a ref for the table to print
   const tableRef = useRef(null);
@@ -30,6 +32,11 @@ function Equipments() {
   // Clear search
   const handleClearSearch = () => {
     setSearchTerm('');
+  };
+
+  // Handle row click to navigate to service history
+  const handleRowClick = (regNo) => {
+    navigate(`/service-history/${regNo}`);
   };
 
   const handlePrint = () => {
@@ -79,7 +86,6 @@ function Equipments() {
 
   return (
     <div className="container">
-
       <h1 className="title">Equipment Inventory</h1>
       <div className="controls-container">
         <div className="search-container">
@@ -108,8 +114,6 @@ function Equipments() {
         )}
       </div>
 
-    
-
       <div className="table-container">
         <table className="equipment-table" ref={tableRef}>
           <thead>
@@ -117,29 +121,33 @@ function Equipments() {
               <th>ID</th>
               <th>Machine</th>
               <th>Reg No</th>
-              <th>COC</th>
+              {/* <th>COC</th> */}
               <th>Brand</th>
               <th>Year</th>
-              <th>Istimara Expiry</th>
+              {/* <th>Istimara Expiry</th>
               <th>Insurance Expiry</th>
               <th>TPC Expiry</th>
-              <th>Operators</th>
+              <th>Operators</th> */}
             </tr>
           </thead>
           <tbody>
             {filteredData.length > 0 ? (
               filteredData.map((item) => (
-                <tr key={item.id}>
+                <tr 
+                  key={item.id} 
+                  onClick={() => handleRowClick(item.regNo)}
+                  className="equipment-row"
+                >
                   <td>{item.id}</td>
                   <td>{item.machine}</td>
                   <td>{item.regNo}</td>
-                  <td>{item.coc}</td>
+                  {/* <td>{item.coc}</td> */}
                   <td>{item.brand}</td>
                   <td>{item.year}</td>
-                  <td>{item.istimaraExpiry}</td>
+                  {/* <td>{item.istimaraExpiry}</td>
                   <td>{item.insuranceExpiry}</td>
                   <td>{item.tpcExpiry}</td>
-                  <td>{item.certificationBody}</td>
+                  <td>{item.certificationBody}</td> */}
                 </tr>
               ))
             ) : (
@@ -150,8 +158,6 @@ function Equipments() {
           </tbody>
         </table>
       </div>
-
-     
     </div>
   );
 }

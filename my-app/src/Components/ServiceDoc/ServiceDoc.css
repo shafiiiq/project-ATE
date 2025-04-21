@@ -143,7 +143,7 @@ body {
 .equipment-fit-to-work {
   position: absolute;
   bottom: 0;
-  right: 1rem;
+  left: 1rem;
   font-weight: 600;
 }
 

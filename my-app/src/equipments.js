@@ -849,7 +849,7 @@ let equipments = [
         "istimaraExpiry": "7/31/2025",
         "insuranceExpiry": "7/31/2025",
         "tpcExpiry": "8/12/2025",
-        "certificationBody": "TUV SUD"
+        "certificationBody": "Keshav"
     },
     {
         "id": 72,
@@ -1293,7 +1293,7 @@ let equipments = [
         "istimaraExpiry": "1/27/2026",
         "insuranceExpiry": "1/27/2026",
         "tpcExpiry": "7/28/2025",
-        "certificationBody": "TUV SUD"
+        "certificationBody": "Ibrahim"
     },
     {
         "id": 109,

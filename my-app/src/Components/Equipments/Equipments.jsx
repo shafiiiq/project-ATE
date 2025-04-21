@@ -121,13 +121,13 @@ function Equipments() {
               <th>ID</th>
               <th>Machine</th>
               <th>Reg No</th>
-              {/* <th>COC</th> */}
+              <th>COC</th>
               <th>Brand</th>
               <th>Year</th>
-              {/* <th>Istimara Expiry</th>
+              <th>Istimara Expiry</th>
               <th>Insurance Expiry</th>
               <th>TPC Expiry</th>
-              <th>Operators</th> */}
+              <th>Operators</th>
             </tr>
           </thead>
           <tbody>
@@ -141,13 +141,13 @@ function Equipments() {
                   <td>{item.id}</td>
                   <td>{item.machine}</td>
                   <td>{item.regNo}</td>
-                  {/* <td>{item.coc}</td> */}
+                  <td>{item.coc}</td>
                   <td>{item.brand}</td>
                   <td>{item.year}</td>
-                  {/* <td>{item.istimaraExpiry}</td>
+                  <td>{item.istimaraExpiry}</td>
                   <td>{item.insuranceExpiry}</td>
                   <td>{item.tpcExpiry}</td>
-                  <td>{item.certificationBody}</td> */}
+                  <td>{item.certificationBody}</td> 
                 </tr>
               ))
             ) : (

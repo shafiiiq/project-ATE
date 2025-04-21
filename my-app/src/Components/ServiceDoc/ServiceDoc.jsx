@@ -1,82 +1,61 @@
 'use client';
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import './ServiceDoc.css';
-import equipments from '../../equipments';
 import logoImage from '../../assets/images/al-ansari.png';
 import sign from '../../assets/images/sign.jpg';
 
-const ServiceDoc = () => {
-  const [filteredData, setFilteredData] = useState(equipments);
-  const [remarks, setRemarks] = useState('');
-  const [serviceHrs, setServiceHrs] = useState('');
-  const [equipmentNo, setEquipmentNo] = useState('');
-  const [nextServiceHrs, setNextServiceHrs] = useState('');
-  const [machine, setMachine] = useState('');
-  const [mechanics, setMechanics] = useState('');
-  const [location, setLocation] = useState('');
-  const [date, setDate] = useState('');
-  const [operatorName, setOperatorName] = useState('');
-  const [mechanicSign, setMechanicSign] = useState('');
+const ServiceDoc = ({ serviceData }) => {
+  // Extract data from props or use default values if not available
+  const {
+    regNo = '',
+    date = '',
+    serviceHrs = '',
+    nextServiceHrs = '',
+    airFilter = '',
+    serviceReport = []
+  } = serviceData || {};
+
+  // Get the first service report (assuming there's at least one)
+  const report = serviceReport && serviceReport.length > 0 ? serviceReport[0] : {};
+  
+  // Extract data from the report
+  const {
+    machine = '',
+    mechanics = '',
+    location = '',
+    operatorName = '',
+    remarks = '',
+    checklistItems = []
+  } = report;
+
+  // Format date from YYYY-MM-DD to DD-MM-YYYY
+  const formatDate = (dateString) => {
+    if (!dateString) return '';
+    
+    // Check if dateString is in YYYY-MM-DD format
+    const parts = dateString.split('-');
+    if (parts.length === 3) {
+      return `${parts[2]}-${parts[1]}-${parts[0]}`;
+    }
+    return dateString; // Return original if format doesn't match
+  };
+
+  const formattedDate = formatDate(date);
+
+  // Determine if air filter was cleaned or changed
+  const ifClean = airFilter === 'Clean';
 
   const handlePrint = () => {
     window.print();
   };
 
-  const correctText = async (text) => {
-    const response = await fetch('https://api.languagetoolplus.com/v2/check', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: new URLSearchParams({
-        text,
-        language: 'en-US',
-      }),
+  // Create an object to lookup checklist items by ID
+  const checklistLookup = {};
+  if (checklistItems && checklistItems.length > 0) {
+    checklistItems.forEach(item => {
+      checklistLookup[item.id] = item.status;
     });
-
-    const result = await response.json();
-    let corrected = text;
-
-    for (const match of result.matches.reverse()) {
-      if (match.replacements.length > 0) {
-        const replacement = match.replacements[0].value;
-        corrected =
-          corrected.slice(0, match.offset) +
-          replacement +
-          corrected.slice(match.offset + match.length);
-      }
-    }
-
-    return corrected;
-  };
-
-  const formatText = (text) => {
-    return text
-      .toLowerCase()
-      .replace(/(^\w|\.\s*\w|\bi\b)/g, (match) => match.toUpperCase());
-  };
-
-  useEffect(() => {
-    const initializeData = async () => {
-      setServiceHrs(formatText('170'));
-      setNextServiceHrs(formatText('800'));
-      setMechanics('Jaidha Machanic');
-      setDate(formatText('16/04/25'));
-      // setMechanicSign(formatText(''));
-      setEquipmentNo(formatText('105113'));
-      setMachine(formatText('Bhoom Truck'));
-      setLocation('Jaidha');
-      setOperatorName('Abid');
-
-      const correctedRemarks =  ('Engine oil changed, Oil filter changed(First free service)');
-      // const correctedRemarks = await correctText(formatText('Engine oil changed, Oil filter changed(24ltr), 2 fuel filter and water seperator changed, Bhoom greasing, Air filter Cleaning'));
-      setRemarks(correctedRemarks);
-    };
-
-    initializeData();
-  }, []);
-
-  const ifCheck = false;
+  }
 
   return (
     <>
@@ -113,90 +92,90 @@ const ServiceDoc = () => {
             <tr>
               <th>SL.NO</th>
               <th>DESCRIPTION</th>
-              <th>STATUS</th>
+              <th>CHECKED</th>
               <th>SL.NO</th>
               <th>DESCRIPTION</th>
-              <th>STATUS</th>
+              <th>CHECKED</th>
             </tr>
           </thead>
           <tbody>
-            {/* Hardcoded checklist items */}
+            {/* First 24 checklist items - 24 rows with left and right columns */}
             <tr>
               <td>1</td>
               <td>Change Engine oil & Filter</td>
-              <td>✓</td>
+              <td>{checklistLookup[1] || ''}</td>
               <td>25</td>
               <td>Check Silencer</td>
-              <td></td>
+              <td>{checklistLookup[25] || ''}</td>
             </tr>
             <tr>
               <td>2</td>
               <td>Change Fuel Filter</td>
-              <td>✓</td>
+              <td>{checklistLookup[2] || ''}</td>
               <td>26</td>
               <td>Replace Hydraulic Oil- Filter</td>
-              <td></td>
+              <td>{checklistLookup[26] || ''}</td>
             </tr>
             <tr>
               <td>3</td>
-              <td>{ifCheck ? "Check/Change Air Filter" : "Clean/Change Air Filter"}</td>
-              <td>✓</td>
+              <td>{ifClean ? "Check/Clean Air Filter" : "Check/Change Air Filter"}</td>
+              <td>{checklistLookup[3] || ''}</td>
               <td>27</td>
               <td>Replace Transmission Oil</td>
-              <td></td>
+              <td>{checklistLookup[27] || ''}</td>
             </tr>
             <tr>
               <td>4</td>
               <td>Check Transmission Filter</td>
-              <td>✓</td>
+              <td>{checklistLookup[4] || ''}</td>
               <td>28</td>
               <td>Replace Differential Oil</td>
-              <td></td>
+              <td>{checklistLookup[28] || ''}</td>
             </tr>
             <tr>
               <td>5</td>
               <td>Check Power Steering Oil</td>
-              <td>✓</td>
+              <td>{checklistLookup[5] || ''}</td>
               <td>29</td>
               <td>Replace Steering Box Oil</td>
-              <td></td>
+              <td>{checklistLookup[29] || ''}</td>
             </tr>
             <tr>
               <td>6</td>
               <td>Check Hydraulic Oil</td>
-              <td>✓</td>
+              <td>{checklistLookup[6] || ''}</td>
               <td>30</td>
               <td>Check Engine Valve Clearence</td>
-              <td></td>
+              <td>{checklistLookup[30] || ''}</td>
             </tr>
             <tr>
               <td>7</td>
               <td>Check Brake</td>
-              <td>✓</td>
+              <td>{checklistLookup[7] || ''}</td>
               <td>31</td>
               <td>Replace clutch fluid</td>
-              <td></td>
+              <td>{checklistLookup[31] || ''}</td>
             </tr>
             <tr>
               <td>8</td>
               <td>Check Tyre Air Pressure</td>
-              <td>✓</td>
+              <td>{checklistLookup[8] || ''}</td>
               <td>32</td>
               <td>Check Brake Lining</td>
-              <td></td>
+              <td>{checklistLookup[32] || ''}</td>
             </tr>
             <tr>
               <td>9</td>
               <td>Check Oil Leak</td>
-              <td>✓</td>
+              <td>{checklistLookup[9] || ''}</td>
               <td>33</td>
               <td>Change Drive Belt</td>
-              <td></td>
+              <td>{checklistLookup[33] || ''}</td>
             </tr>
             <tr>
               <td>10</td>
               <td>Check Battery Condition</td>
-              <td>✓</td>
+              <td>{checklistLookup[10] || ''}</td>
               <td></td>
               <td></td>
               <td></td>
@@ -204,7 +183,7 @@ const ServiceDoc = () => {
             <tr>
               <td>11</td>
               <td>Check Wiper & Water</td>
-              <td>✓</td>
+              <td>{checklistLookup[11] || ''}</td>
               <td></td>
               <td></td>
               <td></td>
@@ -212,7 +191,7 @@ const ServiceDoc = () => {
             <tr>
               <td>12</td>
               <td>Check All Lights</td>
-              <td>✓</td>
+              <td>{checklistLookup[12] || ''}</td>
               <td></td>
               <td></td>
               <td></td>
@@ -220,7 +199,7 @@ const ServiceDoc = () => {
             <tr>
               <td>13</td>
               <td>Check All Horns</td>
-              <td>✓</td>
+              <td>{checklistLookup[13] || ''}</td>
               <td></td>
               <td></td>
               <td></td>
@@ -228,7 +207,7 @@ const ServiceDoc = () => {
             <tr>
               <td>14</td>
               <td>Check Parking Brake</td>
-              <td>✓</td>
+              <td>{checklistLookup[14] || ''}</td>
               <td></td>
               <td></td>
               <td></td>
@@ -236,7 +215,7 @@ const ServiceDoc = () => {
             <tr>
               <td>15</td>
               <td>Check Differential Oil</td>
-              <td>✓</td>
+              <td>{checklistLookup[15] || ''}</td>
               <td></td>
               <td></td>
               <td></td>
@@ -244,7 +223,7 @@ const ServiceDoc = () => {
             <tr>
               <td>16</td>
               <td>Check Rod Water & Hoses</td>
-              <td>✓</td>
+              <td>{checklistLookup[16] || ''}</td>
               <td></td>
               <td></td>
               <td></td>
@@ -252,7 +231,7 @@ const ServiceDoc = () => {
             <tr>
               <td>17</td>
               <td>Lubricants All Points</td>
-              <td>✓</td>
+              <td>{checklistLookup[17] || ''}</td>
               <td></td>
               <td></td>
               <td></td>
@@ -260,7 +239,7 @@ const ServiceDoc = () => {
             <tr>
               <td>18</td>
               <td>Check Gear Shift System</td>
-              <td>✓</td>
+              <td>{checklistLookup[18] || ''}</td>
               <td></td>
               <td></td>
               <td></td>
@@ -268,7 +247,7 @@ const ServiceDoc = () => {
             <tr>
               <td>19</td>
               <td>Check Clutch System</td>
-              <td>✓</td>
+              <td>{checklistLookup[19] || ''}</td>
               <td></td>
               <td></td>
               <td></td>
@@ -276,7 +255,7 @@ const ServiceDoc = () => {
             <tr>
               <td>20</td>
               <td>Check Wheel Nut</td>
-              <td>✓</td>
+              <td>{checklistLookup[20] || ''}</td>
               <td></td>
               <td></td>
               <td></td>
@@ -284,7 +263,7 @@ const ServiceDoc = () => {
             <tr>
               <td>21</td>
               <td>Check Starter & Alternator</td>
-              <td>✓</td>
+              <td>{checklistLookup[21] || ''}</td>
               <td></td>
               <td></td>
               <td></td>
@@ -292,7 +271,7 @@ const ServiceDoc = () => {
             <tr>
               <td>22</td>
               <td>Check Number Plate both</td>
-              <td>✓</td>
+              <td>{checklistLookup[22] || ''}</td>
               <td></td>
               <td></td>
               <td></td>
@@ -300,7 +279,7 @@ const ServiceDoc = () => {
             <tr>
               <td>23</td>
               <td>Check Paint</td>
-              <td>✓</td>
+              <td>{checklistLookup[23] || ''}</td>
               <td></td>
               <td></td>
               <td></td>
@@ -308,13 +287,13 @@ const ServiceDoc = () => {
             <tr>
               <td>24</td>
               <td>Check Tires</td>
-              <td>✓</td>
+              <td>{checklistLookup[24] || ''}</td>
               <td></td>
               <td></td>
               <td></td>
             </tr>
 
-            {/* ✅ Dynamic Remarks */}
+            {/* Remarks Row */}
             <tr className="remarks-row">
               <td colSpan="6">
                 <div className="remarks-box">
@@ -329,10 +308,10 @@ const ServiceDoc = () => {
               </td>
             </tr>
 
-            {/* ✅ Dynamic Footer Section */}
+            {/* Footer Section */}
             <tr>
               <td colSpan="3"><strong>SERVICE HRS:</strong> {serviceHrs}</td>
-              <td colSpan="3"><strong>EQUIPMENT NO:</strong> {equipmentNo}</td>
+              <td colSpan="3"><strong>EQUIPMENT NO:</strong> {regNo}</td>
             </tr>
             <tr>
               <td colSpan="3"><strong>NEXT SERVICE HRS:</strong> {nextServiceHrs}</td>
@@ -343,11 +322,11 @@ const ServiceDoc = () => {
               <td colSpan="3"><strong>LOCATION:</strong> {location}</td>
             </tr>
             <tr>
-              <td colSpan="3"><strong>DATE:</strong> {date}</td>
+              <td colSpan="3"><strong>DATE:</strong> {formattedDate}</td>
               <td colSpan="3"><strong>OPERATOR NAME:</strong> {operatorName}</td>
             </tr>
             <tr className='sign-table'>
-              <td colSpan="3"><strong>MECHANIC SIGN:</strong> {mechanicSign}</td>
+              <td colSpan="3"><strong>MECHANIC SIGN:</strong></td>
               <td colSpan="3"><strong>SUPERVISOR SIGN:</strong>
                 <img className='sign' src={sign} alt="" />
               </td>

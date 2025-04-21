@@ -1,6 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
 import './ServiceHistory.css';
-import serviceHistory from '../../service-history';
 import { useParams, useNavigate } from 'react-router-dom';
 
 function ServiceHistory() {
@@ -12,27 +11,56 @@ function ServiceHistory() {
   const [searchTerm, setSearchTerm] = useState('');
   const [filteredData, setFilteredData] = useState([]);
   const [equipmentData, setEquipmentData] = useState(null);
+  const [serviceHistory, setServiceHistory] = useState([]);
 
   // Create a ref for the table to print
   const tableRef = useRef(null);
 
-  // Filter and sort service history data based on regNo and search term
+  // First useEffect to fetch data
   useEffect(() => {
     // Log the registration number to console
-    console.log("Registration Number:", regNo);
+    // console.log("Registration Number:", regNo);
 
+    fetch(`http://localhost:3001/service-history/get-service-history/${regNo}`, {
+      method: "GET",
+      headers: {
+        "Accept": "*/*",
+        'Content-Type': 'application/json'
+      },
+    })
+    .then((result) => result.json())
+    .then((data) => {
+      console.log(data.data);
+      setServiceHistory(data.data);
+    })
+    .catch(error => {
+      console.error("Error fetching service records:", error);
+      alert("Failed to fetch service records. Please try again.");
+    });
+
+    // Try to find equipment details from your equipments data
+    if (regNo) {
+      import('../../equipments').then(module => {
+        const equipment = module.default.find(eq => eq.regNo.toString().trim() === regNo.toString().trim());
+        setEquipmentData(equipment);
+      }).catch(err => {
+        console.error("Could not load equipment data:", err);
+      });
+    }
+  }, [regNo]); // Only re-run this effect if regNo changes
+
+  // Second useEffect to filter data once serviceHistory is updated
+  useEffect(() => {
     // Filter service history for this specific equipment
     let equipmentServiceHistory = serviceHistory.filter(item => 
-      item.regNo.trim() === regNo?.trim() || 
-      (item.equipmentId && item.equipmentId.trim() === regNo?.trim())
+      item.regNo?.toString().trim() === regNo?.toString().trim() || 
+      (item.equipmentId && item.equipmentId.toString().trim() === regNo?.toString().trim())
     );
 
     // Sort by date (newest first)
     equipmentServiceHistory.sort((a, b) => {
       return new Date(b.date) - new Date(a.date);
     });
-
-    console.log("Filtered service history:", equipmentServiceHistory);
 
     // Apply search term filter if any
     const results = equipmentServiceHistory.filter(item => {
@@ -43,17 +71,7 @@ function ServiceHistory() {
     });
 
     setFilteredData(results);
-
-    // Try to find equipment details from your equipments data
-    if (regNo) {
-      import('../../equipments').then(module => {
-        const equipment = module.default.find(eq => eq.regNo.trim() === regNo.trim());
-        setEquipmentData(equipment);
-      }).catch(err => {
-        console.error("Could not load equipment data:", err);
-      });
-    }
-  }, [regNo, searchTerm]);
+  }, [serviceHistory, regNo, searchTerm]); // Re-run when any of these change
 
   // Navigate to add service form
   const handleAddService = () => {
@@ -115,7 +133,6 @@ function ServiceHistory() {
     };
   };
   
-
   return (
     <div className="container">
       <h1 className="title">Service History</h1>
@@ -179,7 +196,7 @@ function ServiceHistory() {
                   <td>{item.oil}</td>
                   <td>{item.oilFilter}</td>
                   <td>{item.fuelFilter}</td>
-                  <td>{item.waterSeperator}</td>
+                  <td>{item.waterSeparator}</td>
                   <td>{item.airFilter}</td>
                   <td>{item.serviceHrs}</td>
                   <td>{item.nextServiceHrs}</td>

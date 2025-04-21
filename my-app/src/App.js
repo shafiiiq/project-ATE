@@ -20,6 +20,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/service-doc" element={<ServiceDoc />} />
+          <Route path="/service-doc/:regNo/:date" element={<ServiceDoc />} />
           <Route path="/service-form" element={<ServiceForm />} />
           <Route path="/equipments" element={<Equipments />} />
           <Route path="/service-history" element={<ServiceHistory />} />

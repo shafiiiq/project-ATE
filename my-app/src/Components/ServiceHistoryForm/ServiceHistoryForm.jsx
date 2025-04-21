@@ -6,7 +6,7 @@ function ServiceHistoryForm() {
   const { regNo } = useParams();
   const navigate = useNavigate();
   const [equipmentData, setEquipmentData] = useState(null);
-  
+
   // Form data state
   const [formData, setFormData] = useState({
     regNo: regNo || '',
@@ -14,8 +14,8 @@ function ServiceHistoryForm() {
     oil: '✓',
     oilFilter: '✓',
     fuelFilter: '✓',
-    waterSeperator: 'Clean', // Default to Clean
-    airFilter: '✓',
+    waterSeparator: '✓',
+    airFilter: 'Clean',
     serviceHrs: '',
     nextServiceHrs: ''
   });
@@ -41,7 +41,7 @@ function ServiceHistoryForm() {
     }));
   };
 
-  // Calculate next service hours automatically (300 hours after current)
+  // Calculate next service hours automatically (400 hours after current)
   const calculateNextService = (currentHrs) => {
     if (!currentHrs) return '';
     return parseInt(currentHrs) + 400;
@@ -60,23 +60,25 @@ function ServiceHistoryForm() {
   // Handle form submission
   const handleSubmit = (e) => {
     e.preventDefault();
-    
-    // Get existing service history
-    import('../../service-history').then(module => {
-      const currentHistory = [...module.default];
-      
-      // Add new entry
-      currentHistory.unshift(formData); // Add to beginning for newest first
-      
-      // Here you would typically save this to your database
-      // For now, just log the new data
-      console.log("New service history data to save:", currentHistory);
-      
-      // Navigate back to service history page
-      navigate(`/service-history/${regNo}`);
-      
-      // Note: In a real application, you would use an API call to save this data
+
+    // Only send the new form data to the backend
+    fetch('http://localhost:3001/service-history/add-service-history', {
+      method: "POST",
+      headers: {
+        "Accept": "*/*",
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(formData) // Send only the form data, not the entire history
+    })
+    .then((result) => result.json())
+    .then((data) => {
+      console.log("Service record added successfully:", data);
       alert("Service record added successfully!");
+      // navigate(`/service-history/${regNo}`);
+    })
+    .catch(error => {
+      console.error("Error adding service record:", error);
+      alert("Failed to add service record. Please try again.");
     });
   };
 
@@ -91,97 +93,97 @@ function ServiceHistoryForm() {
       {equipmentData && (
         <h3>{equipmentData.machine} - {regNo}</h3>
       )}
-      
+
       <form onSubmit={handleSubmit}>
         <div className="form-group">
           <label htmlFor="date">Service Date</label>
-          <input 
-            type="date" 
-            id="date" 
-            name="date" 
-            value={formData.date} 
+          <input
+            type="date"
+            id="date"
+            name="date"
+            value={formData.date}
             onChange={handleInputChange}
             required
           />
         </div>
-        
+
         <div className="form-row">
           <div className="form-group">
             <label htmlFor="oil">Oil</label>
             <select id="oil" name="oil" value={formData.oil} onChange={handleInputChange}>
               <option value="✓">✓</option>
-              <option value="×">×</option>
+              <option value="X">X</option>
               <option value="--">--</option>
             </select>
           </div>
-          
+
           <div className="form-group">
             <label htmlFor="oilFilter">Oil Filter</label>
             <select id="oilFilter" name="oilFilter" value={formData.oilFilter} onChange={handleInputChange}>
               <option value="✓">✓</option>
-              <option value="×">×</option>
+              <option value="X">X</option>
               <option value="--">--</option>
             </select>
           </div>
         </div>
-        
+
         <div className="form-row">
           <div className="form-group">
             <label htmlFor="fuelFilter">Fuel Filter</label>
             <select id="fuelFilter" name="fuelFilter" value={formData.fuelFilter} onChange={handleInputChange}>
               <option value="✓">✓</option>
-              <option value="×">×</option>
+              <option value="X">X</option>
               <option value="--">--</option>
             </select>
           </div>
-          
+
           <div className="form-group">
             <label htmlFor="waterSeperator">Water Separator</label>
-            <select id="waterSeperator" name="waterSeperator" value={formData.waterSeperator} onChange={handleInputChange}>
+            <select id="waterSeperator" name="waterSeparator" value={formData.waterSeparator} onChange={handleInputChange}>
+              <option value="✓">✓</option>
+              <option value="X">X</option>
+              <option value="--">--</option>
+            </select>
+          </div>
+        </div>
+
+        <div className="form-row">
+          <div className="form-group">
+            <label htmlFor="airFilter">Air Filter</label>
+            <select id="airFilter" name="airFilter" value={formData.airFilter} onChange={handleInputChange}>
               <option value="Clean">Clean</option>
               <option value="Change">Change</option>
               <option value="--">--</option>
             </select>
           </div>
         </div>
-        
-        <div className="form-row">
-          <div className="form-group">
-            <label htmlFor="airFilter">Air Filter</label>
-            <select id="airFilter" name="airFilter" value={formData.airFilter} onChange={handleInputChange}>
-              <option value="✓">✓</option>
-              <option value="×">×</option>
-              <option value="--">--</option>
-            </select>
-          </div>
-        </div>
-        
+
         <div className="form-row">
           <div className="form-group">
             <label htmlFor="serviceHrs">Service Hours</label>
-            <input 
-              type="number" 
-              id="serviceHrs" 
-              name="serviceHrs" 
-              value={formData.serviceHrs} 
+            <input
+              type="number"
+              id="serviceHrs"
+              name="serviceHrs"
+              value={formData.serviceHrs}
               onChange={handleInputChange}
               required
             />
           </div>
-          
+
           <div className="form-group">
             <label htmlFor="nextServiceHrs">Next Service Hours</label>
-            <input 
-              type="number" 
-              id="nextServiceHrs" 
-              name="nextServiceHrs" 
-              value={formData.nextServiceHrs} 
+            <input
+              type="number"
+              id="nextServiceHrs"
+              name="nextServiceHrs"
+              value={formData.nextServiceHrs}
               onChange={handleInputChange}
               required
             />
           </div>
         </div>
-        
+
         <div className="form-buttons">
           <button type="button" className="cancel-button" onClick={handleCancel}>
             Cancel

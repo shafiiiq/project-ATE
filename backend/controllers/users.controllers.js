@@ -13,7 +13,9 @@ const addServiceReport = async (req, res) => {
 }
 
 const getServiceReport = async (req, res) => {
-  userServices.fetchServiceReport()
+  const paramRegNO = req.params.regNo;
+  const paramDate = req.params.date;
+  userServices.fetchServiceReport(paramRegNO, paramDate)
     .then((fetchedUsers) => {
       if (fetchedUsers) {
         res.status(fetchedUsers.status).json(fetchedUsers)

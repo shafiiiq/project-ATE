@@ -18,14 +18,13 @@ const ChecklistItemSchema = new Schema({
   }
 });
 
-
 // Define the main ServiceReport Schema
 const ServiceReportSchema = new Schema({
   serviceHrs: {
     type: String,
     required: true
   },
-  equipmentNo: {
+  regNo: {  // Change from equipmentNo to regNo since your data uses regNo
     type: String,
     required: true,
     index: true // Index for faster queries
@@ -47,9 +46,8 @@ const ServiceReportSchema = new Schema({
     required: true
   },
   date: {
-    type: Date,
+    type: String,
     required: true,
-    default: Date.now
   },
   operatorName: {
     type: String,
@@ -70,4 +68,7 @@ const ServiceReportSchema = new Schema({
   }
 });
 
-module.exports = ServiceReportSchema;
+// Create and export the model (this is what was missing)
+const ServiceReport = mongoose.model('ServiceReport', ServiceReportSchema);
+
+module.exports = ServiceReport;

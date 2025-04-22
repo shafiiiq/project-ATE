@@ -1,62 +1,75 @@
 const { promises } = require('fs');
 const userModel = require('../models/service-report.model.js');
 const serviceHistoryModel = require('../models/service-history.model.js');
+const serviceReportModel = require('../models/service-report.model.js');
 
 module.exports = {
 
-  insertServiceReport: (data) => {    
+  insertServiceReport: (data) => {
+    console.log('Attempting to insert service report:', data);
+    
     return new Promise(async (resolve, reject) => {
       try {
-
+        // Validate required fields
         if (!data || !data.regNo || !data.date) {
-          throw new Error('Missing required data: regNo, date, and reportDetails are required');
+          throw new Error('Missing required data: regNo and date are required');
         }
-    
-        const result = await serviceHistoryModel.findOneAndUpdate(
-          { 
-            regNo: data.regNo,
-            date: data.date 
-          },
-          { $push: { serviceReport: data } },
-          { new: true } 
-        );
-  
+        
+        // Try to create the record
+        const result = await serviceReportModel.create(data);
+        
+        // This condition seems strange - create() normally returns the created object
+        // It shouldn't be null if creation was successful
         if (!result) {
-          throw new Error(`No service history found for regNo: ${data.regNo} and date: ${data.date}`);
+          throw new Error(`Failed to create service report for regNo: ${data.regNo}`);
         }
-  
+        
         resolve({
           status: 200,
           ok: true,
-          message: 'Service report updated',
+          message: 'Service report created successfully',
           data: result
         });
-  
+        
       } catch (err) {
+        console.error('Error inserting service report:', err);
+        
+        // Return the actual error message for better debugging
         reject({
           status: 500,
           ok: false,
-          message: 'Missing data or an error occurred',
+          message: `Error creating service report: ${err.message}`,
           error: err.message
         });
       }
     });
   },
 
-  fetchServiceReport: () => {
+  fetchServiceReport: (paramRegNO, paramDate) => {
+    console.log("param reg no ", paramRegNO);
+    console.log("param date ", paramDate);
+    
+    // Convert the date format from DD-MM-YYYY to YYYY-MM-DD
+    const dateParts = paramDate.split('-');
+    const formattedDate = `${dateParts[2]}-${dateParts[1]}-${dateParts[0]}`;
+    
     return new Promise(async (resolve, reject) => {
       try {
-        const getusers = await userModel.find({});
+        const getReport = await serviceReportModel.find({
+          regNo: paramRegNO, 
+          date: formattedDate
+        });
+        
         resolve({
           status: 200,
           ok: true,
-          data: getusers
+          data: getReport
         });
       } catch (error) {
         reject({
           status: 500,
           ok: false,
-          message: error.message || 'Error fetching users'
+          message: error.message || 'Error fetching Reports'
         });
       }
     });

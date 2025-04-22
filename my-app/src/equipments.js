@@ -285,7 +285,7 @@ let equipments = [
         "istimaraExpiry": "10/8/2025",
         "insuranceExpiry": "10/9/2025",
         "tpcExpiry": "9/24/2025",
-        "certificationBody": "TUV SUD QP STD"
+        "certificationBody": "Arsath"
     },
     {
         "id": 25,
@@ -465,7 +465,7 @@ let equipments = [
         "istimaraExpiry": "10/19/2025",
         "insuranceExpiry": "11/14/2025",
         "tpcExpiry": "9/18/2025",
-        "certificationBody": "TUV SUD"
+        "certificationBody": "Ajmal"
     },
     {
         "id": 40,
@@ -693,7 +693,7 @@ let equipments = [
         "istimaraExpiry": "7/10/2025",
         "insuranceExpiry": "7/10/2025",
         "tpcExpiry": "9/26/2025",
-        "certificationBody": "TUV SUD"
+        "certificationBody": "Love Preeth Sing"
     },
     {
         "id": 59,
@@ -1509,7 +1509,7 @@ let equipments = [
         "istimaraExpiry": "1/4/2026",
         "insuranceExpiry": "1/4/2026",
         "tpcExpiry": "NIL",
-        "certificationBody": "Mukesh"
+        "certificationBody": "Min Bahadoor"
     },
     {
         "id": 127,

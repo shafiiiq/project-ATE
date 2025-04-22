@@ -138,6 +138,10 @@
     justify-content: end;
 }
 
+.doc-click {
+    cursor: pointer;
+}
+
 /* Print styles */
 @media print {
     body {

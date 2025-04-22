@@ -16,6 +16,15 @@ function ServiceHistory() {
   // Create a ref for the table to print
   const tableRef = useRef(null);
 
+  // Function to format date from YYYY-MM-DD to DD-MM-YYYY
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    const day = date.getDate().toString().padStart(2, '0');
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const year = date.getFullYear();
+    return `${day}-${month}-${year}`;
+  };
+
   // First useEffect to fetch data
   useEffect(() => {
     // Log the registration number to console
@@ -28,15 +37,15 @@ function ServiceHistory() {
         'Content-Type': 'application/json'
       },
     })
-    .then((result) => result.json())
-    .then((data) => {
-      console.log(data.data);
-      setServiceHistory(data.data);
-    })
-    .catch(error => {
-      console.error("Error fetching service records:", error);
-      alert("Failed to fetch service records. Please try again.");
-    });
+      .then((result) => result.json())
+      .then((data) => {
+        console.log(data.data);
+        setServiceHistory(data.data);
+      })
+      .catch(error => {
+        console.error("Error fetching service records:", error);
+        alert("Failed to fetch service records. Please try again.");
+      });
 
     // Try to find equipment details from your equipments data
     if (regNo) {
@@ -52,8 +61,8 @@ function ServiceHistory() {
   // Second useEffect to filter data once serviceHistory is updated
   useEffect(() => {
     // Filter service history for this specific equipment
-    let equipmentServiceHistory = serviceHistory.filter(item => 
-      item.regNo?.toString().trim() === regNo?.toString().trim() || 
+    let equipmentServiceHistory = serviceHistory.filter(item =>
+      item.regNo?.toString().trim() === regNo?.toString().trim() ||
       (item.equipmentId && item.equipmentId.toString().trim() === regNo?.toString().trim())
     );
 
@@ -78,6 +87,10 @@ function ServiceHistory() {
     navigate(`/service-history-form/${regNo}`);
   };
 
+  const handleRowClick = (date) => {
+    navigate(`/service-doc/${regNo}/${date}`);
+  }
+
   // Handle search input change
   const handleSearchChange = (e) => {
     setSearchTerm(e.target.value);
@@ -91,7 +104,7 @@ function ServiceHistory() {
   const handlePrint = () => {
     const printWindow = window.open('', '_blank');
     if (!printWindow) return;
-  
+
     const style = `
       <style>
         body { font-family: Arial, sans-serif; padding: 20px; }
@@ -102,7 +115,7 @@ function ServiceHistory() {
         .no-results { text-align: center; font-style: italic; }
       </style>
     `;
-  
+
     const content = `
       <html>
         <head>
@@ -120,24 +133,24 @@ function ServiceHistory() {
         </body>
       </html>
     `;
-  
+
     printWindow.document.open();
     printWindow.document.write(content);
     printWindow.document.close();
     printWindow.focus();
-  
+
     // Wait for content to load before printing
     printWindow.onload = () => {
       printWindow.print();
       printWindow.close();
     };
   };
-  
+
   return (
     <div className="container">
       <h1 className="title">Service History</h1>
       <h3 className="equipment">
-        {equipmentData 
+        {equipmentData
           ? `${equipmentData.machine} - ${regNo}`
           : `Equipment: ${regNo}`}
       </h3>
@@ -191,8 +204,11 @@ function ServiceHistory() {
           <tbody>
             {filteredData.length > 0 ? (
               filteredData.map((item, index) => (
-                <tr key={index}>
-                  <td>{item.date}</td>
+                <tr key={index}
+                  onClick={() => handleRowClick(formatDate(item.date))}
+                  className='doc-click'
+                >
+                  <td>{formatDate(item.date)}</td>
                   <td>{item.oil}</td>
                   <td>{item.oilFilter}</td>
                   <td>{item.fuelFilter}</td>

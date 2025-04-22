@@ -1,58 +1,77 @@
 'use client';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import './ServiceDoc.css';
 import logoImage from '../../assets/images/al-ansari.png';
 import sign from '../../assets/images/sign.jpg';
+import { useParams, useNavigate } from 'react-router-dom';
 
-const ServiceDoc = ({ serviceData }) => {
-  // Extract data from props or use default values if not available
-  const {
-    regNo = '',
-    date = '',
-    serviceHrs = '',
-    nextServiceHrs = '',
-    airFilter = '',
-    serviceReport = []
-  } = serviceData || {};
+const ServiceDoc = () => {
+  const { regNo, date } = useParams();
+  const [reportData, setReportData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
-  // Get the first service report (assuming there's at least one)
-  const report = serviceReport && serviceReport.length > 0 ? serviceReport[0] : {};
-  
-  // Extract data from the report
-  const {
-    machine = '',
-    mechanics = '',
-    location = '',
-    operatorName = '',
-    remarks = '',
-    checklistItems = []
-  } = report;
+  useEffect(() => {
+    fetch(`http://localhost:3001/service-report/get-service-report/${regNo}/${date}`, {
+      method: "GET",
+      headers: {
+        "Accept": "*/*",
+        'Content-Type': 'application/json'
+      },
+    })
+      .then((result) => result.json())
+      .then((data) => {
+        console.log("this is the data ", data.data[0]);
+        setReportData(data.data[0]);
+        setLoading(false);
+      })
+      .catch((error) => {
+        console.error("Error fetching report data:", error);
+        setLoading(false);
+      });
+  }, [regNo, date]);
 
-  // Format date from YYYY-MM-DD to DD-MM-YYYY
   const formatDate = (dateString) => {
     if (!dateString) return '';
-    
-    // Check if dateString is in YYYY-MM-DD format
+
     const parts = dateString.split('-');
     if (parts.length === 3) {
-      return `${parts[2]}-${parts[1]}-${parts[0]}`;
+      return `${parts[0]}-${parts[1]}-${parts[2]}`;
     }
-    return dateString; // Return original if format doesn't match
+    return dateString;
   };
 
   const formattedDate = formatDate(date);
-
-  // Determine if air filter was cleaned or changed
-  const ifClean = airFilter === 'Clean';
+  const ifClean = true;
 
   const handlePrint = () => {
     window.print();
   };
 
-  // Create an object to lookup checklist items by ID
+  const handleAddReport = () => {
+    navigate('/service-form');
+  };
+
+  // If loading, show a loading state
+  if (loading) {
+    return <div className="loading-container">Loading report data...</div>;
+  }
+
+  // If no data is found after loading
+  if (!reportData) {
+    return (
+      <div className="no-data-container">
+        <h2>No report data available for this equipment and date</h2>
+        <button className="add-report-button" onClick={handleAddReport}>
+          Add Report Data
+        </button>
+      </div>
+    );
+  }
+
   const checklistLookup = {};
-  if (checklistItems && checklistItems.length > 0) {
-    checklistItems.forEach(item => {
+  if (reportData.checklistItems && reportData.checklistItems.length > 0) {
+    reportData.checklistItems.forEach(item => {
       checklistLookup[item.id] = item.status;
     });
   }
@@ -299,7 +318,7 @@ const ServiceDoc = ({ serviceData }) => {
                 <div className="remarks-box">
                   <div className="remarks-text">
                     <strong>REMARKS : </strong>
-                    {remarks}
+                    {reportData.remarks}
                   </div>
                 </div>
                 <span className="equipment-fit-to-work">
@@ -310,20 +329,20 @@ const ServiceDoc = ({ serviceData }) => {
 
             {/* Footer Section */}
             <tr>
-              <td colSpan="3"><strong>SERVICE HRS:</strong> {serviceHrs}</td>
+              <td colSpan="3"><strong>SERVICE HRS:</strong> {reportData.serviceHrs}</td>
               <td colSpan="3"><strong>EQUIPMENT NO:</strong> {regNo}</td>
             </tr>
             <tr>
-              <td colSpan="3"><strong>NEXT SERVICE HRS:</strong> {nextServiceHrs}</td>
-              <td colSpan="3"><strong>MACHINE:</strong> {machine}</td>
+              <td colSpan="3"><strong>NEXT SERVICE HRS:</strong> {reportData.nextServiceHrs}</td>
+              <td colSpan="3"><strong>MACHINE:</strong> {reportData.machine}</td>
             </tr>
             <tr>
-              <td colSpan="3"><strong>MECHANICS:</strong> {mechanics}</td>
-              <td colSpan="3"><strong>LOCATION:</strong> {location}</td>
+              <td colSpan="3"><strong>MECHANICS:</strong> {reportData.mechanics}</td>
+              <td colSpan="3"><strong>LOCATION:</strong> {reportData.location}</td>
             </tr>
             <tr>
               <td colSpan="3"><strong>DATE:</strong> {formattedDate}</td>
-              <td colSpan="3"><strong>OPERATOR NAME:</strong> {operatorName}</td>
+              <td colSpan="3"><strong>OPERATOR NAME:</strong> {reportData.operatorName}</td>
             </tr>
             <tr className='sign-table'>
               <td colSpan="3"><strong>MECHANIC SIGN:</strong></td>

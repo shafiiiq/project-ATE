@@ -1,16 +1,61 @@
 const mongoose = require('mongoose');
 
-const Equipments = new mongoose.Schema({
-  id: Number,
-  machine: String,
-  regNo: String,
-  coc: String, // "YES" or "NO"
-  brand: String,
-  year: Number,
-  istimaraExpiry: String,      // format: "dd-mm-yyyy"
-  insuranceExpiry: String,     // format: "dd-mm-yyyy"
-  tpcExpiry: String,           // format: "dd-mm-yyyy"
-  certificationBody: String
+const equipmentSchema = new mongoose.Schema({
+  id: {
+    type: Number,
+    required: true,
+    unique: true
+  },
+  machine: {
+    type: String,
+    required: true
+  },
+  regNo: {
+    type: String,
+    required: true
+  },
+  coc: {
+    type: String,
+    default: ""
+  },
+  brand: {
+    type: String,
+    required: true
+  },
+  year: {
+    type: Number,
+    required: true
+  },
+  istimaraExpiry: {
+    type: String,
+    default: ""
+  },
+  insuranceExpiry: {
+    type: String,
+    default: ""
+  },
+  tpcExpiry: {
+    type: String,
+    default: ""
+  },
+  certificationBody: {
+    type: [String],
+    default: [""]
+  },
+  company: {
+    type: String,
+    default: "ATE",
+    required: true
+  },
+  outside: {
+    type: Boolean,
+    required: true
+  }
+}, {
+  timestamps: true
 });
 
-module.exports = mongoose.model('Equipments', Equipments);
+
+// Create the model
+module.exports = mongoose.model('Equipments', equipmentSchema);
+

@@ -69,6 +69,4 @@ const ServiceReportSchema = new Schema({
 });
 
 // Create and export the model (this is what was missing)
-const ServiceReport = mongoose.model('ServiceReport', ServiceReportSchema);
-
-module.exports = ServiceReport;
+module.exports = mongoose.model('ServiceReport', ServiceReportSchema);

@@ -5,21 +5,15 @@ const serviceReportModel = require('../models/service-report.model.js');
 
 module.exports = {
 
-  insertServiceReport: (data) => {
-    console.log('Attempting to insert service report:', data);
-    
+  insertServiceReport: (data) => {    
     return new Promise(async (resolve, reject) => {
       try {
-        // Validate required fields
         if (!data || !data.regNo || !data.date) {
           throw new Error('Missing required data: regNo and date are required');
         }
         
-        // Try to create the record
         const result = await serviceReportModel.create(data);
         
-        // This condition seems strange - create() normally returns the created object
-        // It shouldn't be null if creation was successful
         if (!result) {
           throw new Error(`Failed to create service report for regNo: ${data.regNo}`);
         }
@@ -34,7 +28,6 @@ module.exports = {
       } catch (err) {
         console.error('Error inserting service report:', err);
         
-        // Return the actual error message for better debugging
         reject({
           status: 500,
           ok: false,

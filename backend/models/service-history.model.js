@@ -38,10 +38,10 @@ const ServiceHistorySchema = new mongoose.Schema({
     type: Number,
     required: true
   },
-  serviceReport:[]
+  serviceReport:[],
+  fullService: {
+    type:Boolean
+  }
 });
 
 module.exports = mongoose.model('ServiceHistory', ServiceHistorySchema);
-
-
- // navigate(`/service-history/${regNo}`);

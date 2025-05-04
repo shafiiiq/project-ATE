@@ -2,7 +2,7 @@ const userServices = require('../services/service-report.js')
 const serviceHistoryServices = require('../services/service-history-services.js')
 
 const addServiceHistory = async (req, res) => {
-  serviceHistoryServices.insertServiceHisory(req.body) 
+  serviceHistoryServices.insertServiceHisory(req.body)
     .then((addHistory) => {
       if (addHistory) {
         res.status(addHistory.status).json(addHistory)
@@ -13,10 +13,35 @@ const addServiceHistory = async (req, res) => {
     })
 }
 
+const addMaintananceHistory = async (req, res) => {
+  serviceHistoryServices.insertMaintananceHisory(req.body)
+    .then((addHistory) => {
+      if (addHistory) {
+        res.status(addHistory.status).json(addHistory)
+      }
+    })
+    .catch((err) => {
+      res.status(err.status || 500).json({ error: err.message })
+    })
+}
+
+const getMaintananceHistory = async (req, res) => {
+  const regNo = req.params.regNo;
+  serviceHistoryServices.fetchMaintananceHistory (regNo)
+    .then((fetchedHistory) => {
+      if (fetchedHistory) {
+        res.status(fetchedHistory.status).json(fetchedHistory)
+      } else {
+        res.status(404).json({ message: 'No service history found' })
+      }
+    })
+    .catch((err) => {
+      res.status(err.status || 500).json({ message: 'Cannot get service history', error: err.message })
+    })
+}
+
 const getServiceHistory = async (req, res) => {
   const regNo = req.params.regNo;
-  console.log("yes here", regNo);
-  
   serviceHistoryServices.fetchServiceHistory(regNo)
     .then((fetchedHistory) => {
       if (fetchedHistory) {
@@ -30,39 +55,83 @@ const getServiceHistory = async (req, res) => {
     })
 }
 
-const updateServiceReport = async (req, res) => {
-  const { id } = req.params;
-  const updateData = req.body;
+const getLatestFullService = async (req, res) => {
+  const regNo = req.params.regNo
 
-  userServices.updateServiceReport(id, updateData)
-    .then((updatedUser) => {
-      if (updatedUser) {
-        res.status(updatedUser.status).json(updatedUser)
+  serviceHistoryServices.fetchLatestFullService(regNo)
+    .then((fetchedHistory) => {
+      if (fetchedHistory) {
+        res.status(fetchedHistory.status).json(fetchedHistory)
+      } else {
+        res.status(404).json({ message: 'No service history found' })
       }
     })
     .catch((err) => {
-      res.status(err.status).json({ error: err.message })
+      res.status(err.status || 500).json({ message: 'Cannot get service history', error: err.message })
     })
 }
 
-
-const deleteServiceReport = async (req, res) => {
-  const { id } = req.params;
-
-  userServices.deleteServiceReport(id)
-    .then((response) => {
-      if (response) {
-        res.status(response.status).json(response)
+const addNextFullService = async (req, res) => {
+  serviceHistoryServices.insertFullService(req.body)
+    .then((addHistory) => {
+      if (addHistory) {
+        res.status(addHistory.status).json(addHistory)
       }
     })
     .catch((err) => {
-      res.status(err.status).json({ error: err.message })
+      res.status(err.status || 500).json({ error: err.message })
+    })
+}
+
+const getFullServiceNotification = async (req, res) => {
+  serviceHistoryServices.fetchFullServiceNotification()
+    .then((fetchedHistory) => {
+      if (fetchedHistory) {
+        res.status(fetchedHistory.status).json(fetchedHistory)
+      } else {
+        res.status(404).json({ message: 'No service history found' })
+      }
+    })
+    .catch((err) => {
+      res.status(err.status || 500).json({ message: 'Cannot get service history', error: err.message })
+    })
+}
+
+const addTyreHistory = async (req, res) => {
+  serviceHistoryServices.insertTyreHisory(req.body)
+    .then((addHistory) => {
+      if (addHistory) {
+        res.status(addHistory.status).json(addHistory)
+      }
+    })
+    .catch((err) => {
+      res.status(err.status || 500).json({ error: err.message })
+    })
+}
+
+const getTyreHistory = async (req, res) => {
+  const regNo = req.params.regNo;
+  serviceHistoryServices.fetchTyreHistory(regNo)
+    .then((fetchedHistory) => {
+      if (fetchedHistory) {
+        res.status(fetchedHistory.status).json(fetchedHistory)
+      } else {
+        res.status(404).json({ message: 'No service history found' })
+      }
+    })
+    .catch((err) => {
+      res.status(err.status || 500).json({ message: 'Cannot get service history', error: err.message })
     })
 }
 
 module.exports = {
   addServiceHistory,
   getServiceHistory,
-  updateServiceReport,
-  deleteServiceReport
+  getLatestFullService,
+  addNextFullService,
+  getFullServiceNotification,
+  addTyreHistory,
+  getTyreHistory,
+  addMaintananceHistory,
+  getMaintananceHistory
 };

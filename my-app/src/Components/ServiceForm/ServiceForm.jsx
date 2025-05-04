@@ -1,16 +1,17 @@
 'use client';
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import './ServiceForm.css';
 import equipments from '../../equipments';
 
 const ServiceForm = ({ initialData = {} }) => {
   const navigate = useNavigate();
+  const { regNo } = useParams();
 
   // Form data state
   const [formData, setFormData] = useState({
     serviceHrs: initialData.serviceHrs || '',
-    regNo: initialData.regNo || '',
+    regNo: regNo || '',
     nextServiceHrs: initialData.nextServiceHrs || '',
     machine: initialData.machine || '',
     mechanics: initialData.mechanics || '',
@@ -150,7 +151,7 @@ const ServiceForm = ({ initialData = {} }) => {
         <h2>Service Report Form</h2>
 
         <form onSubmit={handleSubmit}>
-          <div className="form-header">
+          <div className="form-header-s">
             <div className="form-logo">
               <span>AI Ansari Transport & Enterprises W.L.L</span>
             </div>

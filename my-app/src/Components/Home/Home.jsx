@@ -17,10 +17,13 @@ function Home() {
                 <nav className="sidebar-nav">
                     <ul>
                         <li className="active"><Link to="/">Home</Link></li>
+                        <li><Link to="/equipments">Equipements Inventory</Link></li>
+                        <li><Link to="/stocks">Stocks Inventory</Link></li>
                         <li><Link to="/service-form">Periodic Service Reports</Link></li>
                         <li><a href="#clients">LPO For Quatation</a></li>
-                        <li><a href="#invoices">Tyre Changing Reports</a></li>
+                        <li><a href="/">Tyre Changing Reports</a></li>
                         <li><a href="#reports">Reports</a></li>
+                        <li><a href="#reports">Notifications</a></li>
                         <li><a href="#settings">Settings</a></li>
                     </ul>
                 </nav>
@@ -34,7 +37,7 @@ function Home() {
             <main className="content-area">
                 <div className="hero-section">
                     <div className="hero-overlay"></div>
-                    <img src={Jcb} alt="Hero Image" className="hero-image" />
+                    <img src={Jcb} alt="Hero Img" className="hero-image" />
                     <div className="hero-text">
                         <h1>Welcome to AI Ansari Transport & Enterprises</h1>
                         <p>Your Trusted Partner in Transport and Logistics</p>

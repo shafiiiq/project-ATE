@@ -1,7 +1,7 @@
 /* Table.css */
 
 .container {
-    max-width: 1200px;
+    max-width: 1593px;
     margin: 0 auto;
     padding: 20px;
 }
@@ -19,12 +19,11 @@
     color: #555;
 }
 
-.controls-container {
+.controls-container-m {
     display: flex;
     justify-content: space-between;
     margin-bottom: 20px;
     align-items: center;
-    max-width: 100rem;
     width: 100%;
 }
 
@@ -86,10 +85,9 @@
     gap: 10px;
 }
 
-.table-container {
+.table-container-m {
     overflow-x: auto;
     margin-bottom: 20px;
-    max-width: 107rem;
     width: 100%;
 }
 
@@ -150,17 +148,16 @@
     color: #777;
 }
 
-.table-info {
+.table-info-m {
     text-align: center;
     margin-top: 10px;
-    max-width: 100rem;
     width: 100%;
     display: flex;
     justify-content: end;
 }
 
-.service-th {
-    width: 8rem;
+.service-th-m {
+    width: 12rem;
 }
 
 .doc-click {
@@ -170,18 +167,6 @@
 .maintance-history {
     padding: 10px 20px;
     background-color: rgb(153, 88, 14);
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 14px;
-    transition: background-color 0.3s;
-    font-weight: 600;
-}
-
-.maintance-history-tyre {
-    padding: 10px 20px;
-    background-color: rgb(99, 15, 177);
     color: white;
     border: none;
     border-radius: 4px;

@@ -1,4 +1,4 @@
-let equipments = [
+{let equipments = [
     {
         "id": 1,
         "machine": "3 Ton Forklift",
@@ -9,7 +9,7 @@ let equipments = [
         "istimaraExpiry": "8/12/2025",
         "insuranceExpiry": "8/23/2025",
         "tpcExpiry": "3/18/2025",
-        "certificationBody": "TUV SUD"
+        "certificationBody": " "
     },
     {
         "id": 2,
@@ -261,7 +261,7 @@ let equipments = [
         "istimaraExpiry": "3/18/2026",
         "insuranceExpiry": "3/31/2026",
         "tpcExpiry": "9/5/2025",
-        "certificationBody": "TUV SUD"
+        "certificationBody": " "
     },
     {
         "id": 23,
@@ -309,7 +309,7 @@ let equipments = [
         "istimaraExpiry": "11/26/2025",
         "insuranceExpiry": "11/26/2025",
         "tpcExpiry": "5/27/2025",
-        "certificationBody": "TUV SUD QP STD"
+        "certificationBody": "Tej Pandy"
     },
     {
         "id": 27,
@@ -585,7 +585,7 @@ let equipments = [
         "istimaraExpiry": "9/17/2025",
         "insuranceExpiry": "10/4/2025",
         "tpcExpiry": "9/25/2025",
-        "certificationBody": "TUV"
+        "certificationBody": "Thivari"
     },
     {
         "id": 50,
@@ -681,7 +681,7 @@ let equipments = [
         "istimaraExpiry": "9/17/2025",
         "insuranceExpiry": "10/4/2025",
         "tpcExpiry": "9/30/2025",
-        "certificationBody": "TUV SUD"
+        "certificationBody": "Dumind"
     },
     {
         "id": 58,
@@ -837,7 +837,7 @@ let equipments = [
         "istimaraExpiry": "1/27/2026",
         "insuranceExpiry": "2/11/2026",
         "tpcExpiry": "8/12/2025",
-        "certificationBody": "TUV SUD"
+        "certificationBody": "Jahir Miya"
     },
     {
         "id": 71,
@@ -861,7 +861,7 @@ let equipments = [
         "istimaraExpiry": "7/31/2025",
         "insuranceExpiry": "7/31/2025",
         "tpcExpiry": "8/5/2025",
-        "certificationBody": "TUV SUD"
+        "certificationBody": "Talvinder Sing"
     },
     {
         "id": 73,
@@ -909,7 +909,7 @@ let equipments = [
         "istimaraExpiry": "7/22/2025",
         "insuranceExpiry": "8/14/2025",
         "tpcExpiry": "9/8/2025",
-        "certificationBody": "TUV SUD"
+        "certificationBody": " "
     },
     {
         "id": 77,
@@ -1017,7 +1017,7 @@ let equipments = [
         "istimaraExpiry": "1/27/2026",
         "insuranceExpiry": "2/11/2026",
         "tpcExpiry": "7/17/2025",
-        "certificationBody": "TUV SUD"
+        "certificationBody": " "
     },
     {
         "id": 86,
@@ -1101,7 +1101,7 @@ let equipments = [
         "istimaraExpiry": "11/23/2025",
         "insuranceExpiry": "11/26/2025",
         "tpcExpiry": "7/8/2025",
-        "certificationBody": "TUV SUD"
+        "certificationBody": "Indica"
     },
     {
         "id": 93,
@@ -1245,7 +1245,7 @@ let equipments = [
         "istimaraExpiry": "11/9/2025",
         "insuranceExpiry": "11/26/2025",
         "tpcExpiry": "6/21/2025",
-        "certificationBody": "TUV SUD"
+        "certificationBody": " "
     },
     {
         "id": 105,
@@ -1882,7 +1882,55 @@ let equipments = [
         "insuranceExpiry": "",
         "tpcExpiry": "",
         "certificationBody": ""
-    }
+    },
+    {
+        "id": 158,
+        "machine": "80 Ton Mobile Crane",
+        "regNo": "78862",
+        "coc": "YES",
+        "brand": "ZOOMLION",
+        "year": 2025,
+        "istimaraExpiry": "",
+        "insuranceExpiry": "",
+        "tpcExpiry": "",
+        "certificationBody": ""
+    },
+    {
+        "id": 159,
+        "machine": "80 Ton Mobile Crane",
+        "regNo": "78863",
+        "coc": "YES",
+        "brand": "ZOOMLION",
+        "year": 2025,
+        "istimaraExpiry": "",
+        "insuranceExpiry": "",
+        "tpcExpiry": "",
+        "certificationBody": ""
+    },
+    {
+        "id": 160,
+        "machine": "110 Ton Mobile Crane",
+        "regNo": "78971",
+        "coc": "YES",
+        "brand": "SANY",
+        "year": 2025,
+        "istimaraExpiry": "",
+        "insuranceExpiry": "",
+        "tpcExpiry": "",
+        "certificationBody": ""
+    },
+    // {
+    //     "id": 159,
+    //     "machine": "Zoomlion 80 Ton Crane",
+    //     "regNo": "70155",
+    //     "coc": "YES",
+    //     "brand": "ZOOMLION",
+    //     "year": 2025,
+    //     "istimaraExpiry": "",
+    //     "insuranceExpiry": "",
+    //     "tpcExpiry": "",
+    //     "certificationBody": "Muhammad Gul"
+    // }
 ]
 
-module.exports = equipments
+module.exports = equipments}

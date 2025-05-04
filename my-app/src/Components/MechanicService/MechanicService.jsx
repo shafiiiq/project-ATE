@@ -1,14 +1,14 @@
 import { useState, useRef, useEffect } from 'react';
-import './ServiceHistory.css';
+import './MechanicService.css';
 import { useParams, useNavigate } from 'react-router-dom';
 
-function ServiceHistory(props) {
+function MechanicService(props) {
   // Get the regNo from URL parameters and setup navigation
   const { regNo } = useParams();
   const navigate = useNavigate();
   
-  // Determine if this is maintenance view or regular service history
-  const isMaintenance = props.maintanance === true;
+  // Determine if this is tyre view or battery service history
+  const isTyre = props.tyre === true;
 
   // State for search functionality
   const [searchTerm, setSearchTerm] = useState('');
@@ -31,9 +31,9 @@ function ServiceHistory(props) {
   // First useEffect to fetch data
   useEffect(() => {
     // Define endpoint based on the view type
-    const endpoint = isMaintenance 
-      ? `http://localhost:3001/service-history/get-maintanance-history/${regNo}`
-      : `http://localhost:3001/service-history/get-service-history/${regNo}`;
+    const endpoint = isTyre 
+      ? `http://localhost:3001/service-history/get-tyre-history/${regNo}`
+      : `http://localhost:3001/service-history/get-battery-history/${regNo}`;
 
     fetch(endpoint, {
       method: "GET",
@@ -44,11 +44,12 @@ function ServiceHistory(props) {
     })
       .then((result) => result.json())
       .then((data) => {
+        console.log(data.data);
         setServiceHistory(data.data);
       })
       .catch(error => {
-        console.error(`Error fetching ${isMaintenance ? 'maintenance' : 'service'} records:`, error);
-        alert(`Failed to fetch ${isMaintenance ? 'maintenance' : 'service'} records. Please try again.`);
+        console.error(`Error fetching ${isTyre ? 'tyre' : 'battery'} records:`, error);
+        alert(`Failed to fetch ${isTyre ? 'tyre' : 'battery'} records. Please try again.`);
       });
 
     // Try to find equipment details from your equipments data
@@ -60,13 +61,13 @@ function ServiceHistory(props) {
         console.error("Could not load equipment data:", err);
       });
     }
-  }, [regNo, isMaintenance]); // Re-run this effect if regNo or isMaintenance changes
+  }, [regNo, isTyre]); // Re-run this effect if regNo or isTyre changes
 
   // Second useEffect to filter data once serviceHistory is updated
   useEffect(() => {
     // Filter service history for this specific equipment
     let equipmentServiceHistory = serviceHistory.filter(item =>
-      item.regNo?.toString().trim() === regNo?.toString().trim() ||
+      item.equipmentNo?.toString().trim() === regNo?.toString().trim() ||
       (item.equipmentId && item.equipmentId.toString().trim() === regNo?.toString().trim())
     );
 
@@ -88,27 +89,23 @@ function ServiceHistory(props) {
 
   // Navigate to add service form
   const handleAddService = () => {
-    if (isMaintenance) {
-      navigate(`/maintenance-history-form/${regNo}`);
+    if (isTyre) {
+      navigate(`/tyre-history-form/${regNo}`);
     } else {
-      navigate(`/service-history-form/${regNo}`);
+      navigate(`/battery-history-form/${regNo}`);
     }
   };
 
   const handleToggleView = () => {
-    if (isMaintenance) {
-      navigate(`/service-history/${regNo}`);
+    if (isTyre) {
+      navigate(`/battery-history/${regNo}`);
     } else {
-      navigate(`/maintanance-history/${regNo}`);
+      navigate(`/tyre-history/${regNo}`);
     }
   };  
 
-  const showTyreService = () => {
-      navigate(`/tyre-history/${regNo}`);
-  };
-
   const handleRowClick = (date) => {
-    const path = isMaintenance ? `/maintenance-doc/${regNo}/${date}` : `/service-doc/${regNo}/${date}`;
+    const path = isTyre ? `/tyre-doc/${regNo}/${date}` : `/battery-doc/${regNo}/${date}`;
     navigate(path);
   }
 
@@ -134,18 +131,18 @@ function ServiceHistory(props) {
         th, td { border: 1px solid #000; padding: 8px; text-align: center; }
         th { background-color: #f2f2f2; }
         .no-results { text-align: center; font-style: italic; }
-        .full-service-row { background-color: #ffd3a5 !important; } /* Orange background for full service rows */
+        .replacement-row { background-color: #ffd3a5 !important; } /* Orange background for replacement rows */
       </style>
     `;
 
     const content = `
       <html>
         <head>
-          <title>${isMaintenance ? 'Maintenance' : 'Service'} History</title>
+          <title>${isTyre ? 'Tyre' : 'Battery'} Service History</title>
           ${style}
         </head>
         <body>
-          <h1>${isMaintenance ? 'Maintenance' : 'Periodic Service'} History</h1>
+          <h1>${isTyre ? 'Tyre' : 'Battery'} Service History</h1>
           <h2>${equipmentData ? `${equipmentData.machine} - ${regNo}` : `Equipment: ${regNo}`}</h2>
           ${searchTerm ? `<p>Search results for: "<strong>${searchTerm}</strong>"</p>` : ''}
           ${tableRef.current?.outerHTML}
@@ -171,7 +168,7 @@ function ServiceHistory(props) {
   return (
     <div className="container">
       <h1 className="title">
-        {isMaintenance ? 'Maintanance Service History' : 'Periodic Service History'}
+        {isTyre ? 'Tyre Service History' : 'Battery Service History'}
       </h1>
       <h3 className="equipment">
         {equipmentData
@@ -179,11 +176,11 @@ function ServiceHistory(props) {
           : `Equipment: ${regNo}`}
       </h3>
 
-      <div className="controls-container">
+      <div className="controls-container-m">
         <div className="search-container">
           <input
             type="text"
-            placeholder={isMaintenance ? "Search maintanance history..." : "Search service history..."}
+            placeholder={isTyre ? "Search tyre history..." : "Search battery history..."}
             value={searchTerm}
             onChange={handleSearchChange}
             className="search-input"
@@ -196,20 +193,17 @@ function ServiceHistory(props) {
         </div>
         <div className="action-buttons">
           <button onClick={handleAddService} className="add-button">
-            Add {isMaintenance ? 'Maintanance' : 'Service'}
+            Add {isTyre ? 'Tyre' : 'Battery'} Service
           </button>
           <button onClick={handleToggleView} className="maintance-history">
-            Show {isMaintenance ? 'Periodic History' : 'Maintanance History'}
-          </button>
-          <button onClick={showTyreService} className="maintance-history-tyre">
-            Show Tyre Sevice
+            Show {isTyre ? 'Battery History' : 'Tyre History'}
           </button>
           <button onClick={handlePrint} className="print-button">
             Print Table
           </button>
         </div>
       </div>
-      <div className="table-info">
+      <div className="table-info-m">
         {searchTerm ? (
           `Found ${filteredData.length} matching ${filteredData.length === 1 ? 'entry' : 'entries'}`
         ) : (
@@ -217,27 +211,32 @@ function ServiceHistory(props) {
         )}
       </div>
 
-      <div className="table-container">
+      <div className="table-container-m">
         <table className="equipment-table" ref={tableRef}>
           <thead>
             <tr>
-              {isMaintenance ? (
+              {isTyre ? (
                 <>
-                  <th>Date</th>
+                  <th className='date-th'>Date</th>
+                  <th>Tyre Model</th>
+                  <th>Tyre Number</th>
+                  <th>Equipment</th>
                   <th>Equipment No</th>
-                  <th style={{ width: '80%' }}>Work Remarks</th>
+                  <th>Location</th>
+                  <th className='service-th-m'>Operator</th>
+                  <th className='date-th'>Running Hrs / Km</th>
                 </>
               ) : (
                 <>
                   <th className='date-th'>Date</th>
-                  <th>Oil</th>
-                  <th>Oil Filter</th>
-                  <th>Fuel Filter</th>
-                  <th>Water Separator</th>
-                  <th>Air Filter</th>
-                  <th className='service-th'>Serviced Hrs</th>
-                  <th className='date-th'>Next Service Hrs</th>
-                  <th className='next-f-th'>Next Full Service Hrs</th>
+                  <th>Brand</th>
+                  <th>Model</th>
+                  <th>Serial Number</th>
+                  <th>Voltage</th>
+                  <th>Amp Hours</th>
+                  <th className='service-th'>Service KM</th>
+                  <th className='date-th'>Next Service KM</th>
+                  <th>Replaced</th>
                   <th>Work Remarks</th>
                 </>
               )}
@@ -249,31 +248,38 @@ function ServiceHistory(props) {
                 <tr 
                   key={index}
                   onClick={() => handleRowClick(formatDate(item.date))}
-                  className={`doc-click ${item.fullService ? 'full-service-row' : ''}`}
+                  className={`doc-click ${item.replaced ? 'replacement-row' : ''}`}
                 >
                   <td>{formatDate(item.date)}</td>
-                  { isMaintenance ?   <td style={{ textAlign: 'left' }}>{item.regNo}</td> : ""}
-                  {isMaintenance ? (
-                    <td style={{ textAlign: 'left' }}>{item.workRemarks}</td>
+                  {isTyre ? (
+                    <>
+                      <td>{item.tyreModel}</td>
+                      <td>{item.tyreNumber}</td>
+                      <td>{item.equipment}</td>
+                      <td>{item.equipmentNo}</td>
+                      <td>{item.location}</td>
+                      <td>{item.operator}</td>
+                      <td>{item.runningHours}</td>
+                    </>
                   ) : (
                     <>
-                      <td>{item.oil}</td>
-                      <td>{item.oilFilter}</td>
-                      <td>{item.fuelFilter}</td>
-                      <td>{item.waterSeparator}</td>
-                      <td>{item.airFilter}</td>
-                      <td>{item.serviceHrs}</td>
-                      <td>{item.nextServiceHrs}</td>
-                     { item.fullService ?  <td>{item.serviceHrs + 3000}</td> :  <td></td>}
-                     { item.fullService ?  <td>{item.remarks}</td> :  <td></td>}
+                      <td>{item.brand}</td>
+                      <td>{item.model}</td>
+                      <td>{item.serialNumber}</td>
+                      <td>{item.voltage}</td>
+                      <td>{item.ampHours}</td>
+                      <td>{item.serviceKm}</td>
+                      <td>{item.nextServiceKm}</td>
+                      <td>{item.replaced ? 'Yes' : 'No'}</td>
+                      <td style={{ textAlign: 'left' }}>{item.workRemarks}</td>
                     </>
                   )}
                 </tr>
               ))
             ) : (
               <tr>
-                <td colSpan={isMaintenance ? "3" : "10"} className="no-results">
-                  No {isMaintenance ? 'maintenance' : 'service history'} records found for this equipment
+                <td colSpan={isTyre ? "10" : "10"} className="no-results">
+                  No {isTyre ? 'tyre' : 'battery'} service records found for this equipment
                 </td>
               </tr>
             )}
@@ -284,4 +290,4 @@ function ServiceHistory(props) {
   );
 }
 
-export default ServiceHistory;
+export default MechanicService;

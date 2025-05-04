@@ -122,7 +122,7 @@ const ServiceDoc = () => {
             <tr>
               <td>1</td>
               <td>Change Engine oil & Filter</td>
-              <td>{checklistLookup[1] || ''}</td>
+              <td className='tick'>{checklistLookup[1] || ''}</td>
               <td>25</td>
               <td>Check Silencer</td>
               <td>{checklistLookup[25] || ''}</td>
@@ -130,7 +130,7 @@ const ServiceDoc = () => {
             <tr>
               <td>2</td>
               <td>Change Fuel Filter</td>
-              <td>{checklistLookup[2] || ''}</td>
+              <td className='tick'>{checklistLookup[2] || ''}</td>
               <td>26</td>
               <td>Replace Hydraulic Oil- Filter</td>
               <td>{checklistLookup[26] || ''}</td>
@@ -138,7 +138,7 @@ const ServiceDoc = () => {
             <tr>
               <td>3</td>
               <td>{ifClean ? "Check/Clean Air Filter" : "Check/Change Air Filter"}</td>
-              <td>{checklistLookup[3] || ''}</td>
+              <td className='tick'>{checklistLookup[3] || ''}</td>
               <td>27</td>
               <td>Replace Transmission Oil</td>
               <td>{checklistLookup[27] || ''}</td>
@@ -146,7 +146,7 @@ const ServiceDoc = () => {
             <tr>
               <td>4</td>
               <td>Check Transmission Filter</td>
-              <td>{checklistLookup[4] || ''}</td>
+              <td className='tick'>{checklistLookup[4] || ''}</td>
               <td>28</td>
               <td>Replace Differential Oil</td>
               <td>{checklistLookup[28] || ''}</td>
@@ -154,7 +154,7 @@ const ServiceDoc = () => {
             <tr>
               <td>5</td>
               <td>Check Power Steering Oil</td>
-              <td>{checklistLookup[5] || ''}</td>
+              <td className='tick'>{checklistLookup[5] || ''}</td>
               <td>29</td>
               <td>Replace Steering Box Oil</td>
               <td>{checklistLookup[29] || ''}</td>
@@ -162,7 +162,7 @@ const ServiceDoc = () => {
             <tr>
               <td>6</td>
               <td>Check Hydraulic Oil</td>
-              <td>{checklistLookup[6] || ''}</td>
+              <td className='tick'>{checklistLookup[6] || ''}</td>
               <td>30</td>
               <td>Check Engine Valve Clearence</td>
               <td>{checklistLookup[30] || ''}</td>
@@ -170,7 +170,7 @@ const ServiceDoc = () => {
             <tr>
               <td>7</td>
               <td>Check Brake</td>
-              <td>{checklistLookup[7] || ''}</td>
+              <td className='tick'>{checklistLookup[7] || ''}</td>
               <td>31</td>
               <td>Replace clutch fluid</td>
               <td>{checklistLookup[31] || ''}</td>
@@ -178,7 +178,7 @@ const ServiceDoc = () => {
             <tr>
               <td>8</td>
               <td>Check Tyre Air Pressure</td>
-              <td>{checklistLookup[8] || ''}</td>
+              <td className='tick'>{checklistLookup[8] || ''}</td>
               <td>32</td>
               <td>Check Brake Lining</td>
               <td>{checklistLookup[32] || ''}</td>
@@ -186,7 +186,7 @@ const ServiceDoc = () => {
             <tr>
               <td>9</td>
               <td>Check Oil Leak</td>
-              <td>{checklistLookup[9] || ''}</td>
+              <td className='tick'>{checklistLookup[9] || ''}</td>
               <td>33</td>
               <td>Change Drive Belt</td>
               <td>{checklistLookup[33] || ''}</td>
@@ -194,7 +194,7 @@ const ServiceDoc = () => {
             <tr>
               <td>10</td>
               <td>Check Battery Condition</td>
-              <td>{checklistLookup[10] || ''}</td>
+              <td className='tick'>{checklistLookup[10] || ''}</td>
               <td></td>
               <td></td>
               <td></td>
@@ -202,7 +202,7 @@ const ServiceDoc = () => {
             <tr>
               <td>11</td>
               <td>Check Wiper & Water</td>
-              <td>{checklistLookup[11] || ''}</td>
+              <td className='tick'>{checklistLookup[11] || ''}</td>
               <td></td>
               <td></td>
               <td></td>
@@ -210,7 +210,7 @@ const ServiceDoc = () => {
             <tr>
               <td>12</td>
               <td>Check All Lights</td>
-              <td>{checklistLookup[12] || ''}</td>
+              <td className='tick'>{checklistLookup[12] || ''}</td>
               <td></td>
               <td></td>
               <td></td>
@@ -218,7 +218,7 @@ const ServiceDoc = () => {
             <tr>
               <td>13</td>
               <td>Check All Horns</td>
-              <td>{checklistLookup[13] || ''}</td>
+              <td className='tick'>{checklistLookup[13] || ''}</td>
               <td></td>
               <td></td>
               <td></td>
@@ -226,7 +226,7 @@ const ServiceDoc = () => {
             <tr>
               <td>14</td>
               <td>Check Parking Brake</td>
-              <td>{checklistLookup[14] || ''}</td>
+              <td className='tick'>{checklistLookup[14] || ''}</td>
               <td></td>
               <td></td>
               <td></td>
@@ -234,7 +234,7 @@ const ServiceDoc = () => {
             <tr>
               <td>15</td>
               <td>Check Differential Oil</td>
-              <td>{checklistLookup[15] || ''}</td>
+              <td className='tick'>{checklistLookup[15] || ''}</td>
               <td></td>
               <td></td>
               <td></td>
@@ -242,7 +242,7 @@ const ServiceDoc = () => {
             <tr>
               <td>16</td>
               <td>Check Rod Water & Hoses</td>
-              <td>{checklistLookup[16] || ''}</td>
+              <td className='tick'>{checklistLookup[16] || ''}</td>
               <td></td>
               <td></td>
               <td></td>
@@ -250,7 +250,7 @@ const ServiceDoc = () => {
             <tr>
               <td>17</td>
               <td>Lubricants All Points</td>
-              <td>{checklistLookup[17] || ''}</td>
+              <td className='tick'>{checklistLookup[17] || ''}</td>
               <td></td>
               <td></td>
               <td></td>
@@ -258,7 +258,7 @@ const ServiceDoc = () => {
             <tr>
               <td>18</td>
               <td>Check Gear Shift System</td>
-              <td>{checklistLookup[18] || ''}</td>
+              <td className='tick'>{checklistLookup[18] || ''}</td>
               <td></td>
               <td></td>
               <td></td>
@@ -266,7 +266,7 @@ const ServiceDoc = () => {
             <tr>
               <td>19</td>
               <td>Check Clutch System</td>
-              <td>{checklistLookup[19] || ''}</td>
+              <td className='tick'>{checklistLookup[19] || ''}</td>
               <td></td>
               <td></td>
               <td></td>
@@ -274,7 +274,7 @@ const ServiceDoc = () => {
             <tr>
               <td>20</td>
               <td>Check Wheel Nut</td>
-              <td>{checklistLookup[20] || ''}</td>
+              <td className='tick'>{checklistLookup[20] || ''}</td>
               <td></td>
               <td></td>
               <td></td>
@@ -282,7 +282,7 @@ const ServiceDoc = () => {
             <tr>
               <td>21</td>
               <td>Check Starter & Alternator</td>
-              <td>{checklistLookup[21] || ''}</td>
+              <td className='tick'>{checklistLookup[21] || ''}</td>
               <td></td>
               <td></td>
               <td></td>
@@ -290,7 +290,7 @@ const ServiceDoc = () => {
             <tr>
               <td>22</td>
               <td>Check Number Plate both</td>
-              <td>{checklistLookup[22] || ''}</td>
+              <td className='tick'>{checklistLookup[22] || ''}</td>
               <td></td>
               <td></td>
               <td></td>
@@ -298,7 +298,7 @@ const ServiceDoc = () => {
             <tr>
               <td>23</td>
               <td>Check Paint</td>
-              <td>{checklistLookup[23] || ''}</td>
+              <td className='tick'>{checklistLookup[23] || ''}</td>
               <td></td>
               <td></td>
               <td></td>
@@ -306,7 +306,7 @@ const ServiceDoc = () => {
             <tr>
               <td>24</td>
               <td>Check Tires</td>
-              <td>{checklistLookup[24] || ''}</td>
+              <td className='tick'>{checklistLookup[24] || ''}</td>
               <td></td>
               <td></td>
               <td></td>

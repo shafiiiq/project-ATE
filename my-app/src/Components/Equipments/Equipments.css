@@ -67,7 +67,7 @@
   color: #333;
 }
 
-.print-button {
+.print-button, .add-button {
   background-color: #4CAF50;
   color: white;
   border: none;
@@ -77,10 +77,15 @@
   font-size: 14px;
   display: flex;
   align-items: center;
+  margin-left: 10px;
 }
 
-.print-button:hover {
+.print-button:hover, .add-button:hover {
   background-color: #45a049;
+}
+
+.buttons-container {
+  display: flex;
 }
 
 .table-container {
@@ -131,6 +136,159 @@
   width: 100%;
   display: flex;
   justify-content: end;
+}
+
+/* Modal Overlay */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+/* Modal Content */
+.modal-content {
+  background-color: white;
+  border-radius: 8px;
+  width: 90%;
+  max-width: 500px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  animation: modal-appear 0.3s ease-out;
+}
+
+@keyframes modal-appear {
+  from {
+    opacity: 0;
+    transform: translateY(-50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Modal Header */
+.modal-header {
+  padding: 15px 20px;
+  border-bottom: 1px solid #e9ecef;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+}
+
+.modal-header h2 {
+  margin: 0;
+  font-size: 1.25rem;
+  color: #333;
+}
+
+/* Modal Body */
+.modal-body {
+  padding: 20px;
+}
+
+.modal-body p {
+  margin-bottom: 10px;
+  color: #444;
+}
+
+/* Modal Footer */
+.modal-footer {
+  padding: 15px 20px;
+  border-top: 1px solid #e9ecef;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  border-bottom-left-radius: 8px;
+  border-bottom-right-radius: 8px;
+}
+
+/* Modal Buttons */
+.modal-footer button {
+  padding: 8px 16px;
+  border-radius: 4px;
+  border: none;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.cancel-button {
+  background-color: #e9ecef;
+  color: #212529;
+}
+
+.cancel-button:hover {
+  background-color: #dde0e3;
+}
+
+.confirm-delete-button {
+  background-color: #dc3545;
+  color: white;
+}
+
+.confirm-delete-button:hover {
+  background-color: #c82333;
+}
+
+.ok-button {
+  background-color: #0d6efd;
+  color: white;
+}
+
+.ok-button:hover {
+  background-color: #0b5ed7;
+}
+
+/* Success and Error Modal Styling */
+.success-modal .modal-header {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+.error-modal .modal-header {
+  background-color: #f8d7da;
+  color: #721c24;
+}
+
+/* Action Buttons in Table */
+.actions-cell {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+}
+
+.edit-button,
+.delete-button {
+  padding: 6px 12px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.2s;
+}
+
+.edit-button {
+  background-color: #084baf;
+  color: white;
+}
+
+.edit-button:hover {
+  background-color: #0b5ed7;
+}
+
+.delete-button {
+  background-color: #af0d1d;
+  color: white;
+}
+
+.delete-button:hover {
+  background-color: #c82333;
 }
 
 /* Print styles */
@@ -215,7 +373,6 @@
   }
 }
 
-
 .equipment-row {
   cursor: pointer;
   transition: background-color 0.2s;
@@ -223,4 +380,75 @@
 
 .equipment-row:hover {
   background-color: #f5f5f5;
+}
+
+/* Operator Cell Styling */
+.operator-cell {
+  position: relative;
+}
+
+.view-all-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(0, 0, 0, 0.05);
+  z-index: 5;
+}
+
+.view-all-button {
+  background-color: #0d6efd;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 4px 8px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.view-all-button:hover {
+  background-color: #0b5ed7;
+  transform: scale(1.05);
+}
+
+/* Operators Modal Styling */
+.operators-modal {
+  max-width: 600px;
+}
+
+.operators-list {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.operators-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.operators-table th,
+.operators-table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+}
+
+.operators-table th {
+  background-color: #f2f2f2;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.operators-table tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+.operators-table tr:hover {
+  background-color: #f1f1f1;
 }

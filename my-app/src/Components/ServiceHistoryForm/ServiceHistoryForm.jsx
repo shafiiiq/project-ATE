@@ -17,7 +17,8 @@ function ServiceHistoryForm() {
     waterSeparator: '✓',
     airFilter: 'Clean',
     serviceHrs: '',
-    nextServiceHrs: ''
+    nextServiceHrs: '',
+    fullService: false
   });
 
   // Load equipment details if available
@@ -61,28 +62,60 @@ function ServiceHistoryForm() {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    // Only send the new form data to the backend
+    fetch(`http://localhost:3001/service-history/get-latest-full-service/${regNo}`, {
+      method: "GET",
+      headers: {
+        "Accept": "*/*",
+        'Content-Type': 'application/json'
+      }
+    }).then((result) => result.json())
+      .then((data) => {        
+        console.log(data);
+        if (data && data.ok == true && data.data.fullService === true  && data.data.serviceHrs + 3000 <= formData.nextServiceHrs) {          
+          fetch(`http://localhost:3001/service-history/add-full-service-notification/${regNo}`, {
+            method: "POST",
+            headers: {
+              "Accept": "*/*",
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              regNo: regNo,
+              mechine: equipmentData.machine,
+              lastServiceHrs: formData.serviceHrs,
+              nextFullServiceHrs: formData.nextServiceHrs
+            }) // Send only the form data, not the entire history
+          })
+            .then((result) => result.json())
+            .then((data) => {
+              console.log("Service record added successfully:", data);
+            })
+            .catch(error => {
+              console.error("Error adding service record:", error);
+              alert("Failed to add service record. Please try again.");
+            });
+        }
+      })
+
+
     fetch('http://localhost:3001/service-history/add-service-history', {
       method: "POST",
       headers: {
         "Accept": "*/*",
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify(formData) // Send only the form data, not the entire history
+      body: JSON.stringify(formData) 
     })
-    .then((result) => result.json())
-    .then((data) => {
-      console.log("Service record added successfully:", data);
-      alert("Service record added successfully!");
-      // navigate(`/service-history/${regNo}`);
-    })
-    .catch(error => {
-      console.error("Error adding service record:", error);
-      alert("Failed to add service record. Please try again.");
-    });
+      .then((result) => result.json())
+      .then((data) => {
+        console.log("Service record added successfully:", data);
+        alert("Service record added successfully!");
+      })
+      .catch(error => {
+        console.error("Error adding service record:", error);
+        alert("Failed to add service record. Please try again.");
+      });
   };
 
-  // Cancel and go back to service history
   const handleCancel = () => {
     navigate(`/service-history/${regNo}`);
   };
@@ -183,6 +216,18 @@ function ServiceHistoryForm() {
             />
           </div>
         </div>
+
+        {/* full service starts */}
+        <div className="form-row">
+          <div className="form-group">
+            <label htmlFor="fullService">Full Service</label>
+            <select id="fullService" name="fullService" value={formData.fullService} onChange={handleInputChange}>
+              <option value="false">X</option>
+              <option value="true">✓</option>
+            </select>
+          </div>
+        </div>
+        {/* full service ends  */}
 
         <div className="form-buttons">
           <button type="button" className="cancel-button" onClick={handleCancel}>

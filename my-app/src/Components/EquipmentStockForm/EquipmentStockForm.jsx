@@ -15,6 +15,11 @@ const EquipmentStockForm = () => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const [success, setSuccess] = useState(false);
+    
+    // Image upload limits
+    const MAX_FILE_SIZE = 2048 * 2048; // 2MB per file
+    const MAX_TOTAL_SIZE = 10 * 1024 * 1024; // 20MB total
+    const MAX_FILES = 10; // Maximum 10 files
 
     // Handle input change for basic fields
     const handleInputChange = (e) => {
@@ -55,13 +60,45 @@ const EquipmentStockForm = () => {
         });
     };
 
-    // Handle image selection
+    // Handle image selection with validation
     const handleImageChange = (e) => {
         if (e.target.files) {
-            const newImages = Array.from(e.target.files);
+            const selectedFiles = Array.from(e.target.files);
+            
+            // Calculate current total size
+            const currentTotalSize = formData.images.reduce((sum, img) => sum + img.size, 0);
+            
+            // Validate number of files
+            if (formData.images.length + selectedFiles.length > MAX_FILES) {
+                setError(`You can upload a maximum of ${MAX_FILES} images`);
+                return;
+            }
+            
+            // Validate files
+            let newTotalSize = currentTotalSize;
+            const validFiles = [];
+            
+            for (const file of selectedFiles) {
+                // Check file size
+                if (file.size > MAX_FILE_SIZE) {
+                    setError(`File ${file.name} exceeds the maximum size of 2MB`);
+                    return;
+                }
+                
+                // Check total size
+                newTotalSize += file.size;
+                if (newTotalSize > MAX_TOTAL_SIZE) {
+                    setError(`Total file size exceeds the maximum of 20MB`);
+                    return;
+                }
+                
+                validFiles.push(file);
+            }
+            
+            setError(null);
             setFormData({
                 ...formData,
-                images: [...formData.images, ...newImages]
+                images: [...formData.images, ...validFiles]
             });
         }
     };
@@ -75,6 +112,8 @@ const EquipmentStockForm = () => {
             ...formData,
             images: updatedImages
         });
+        // Clear error when removing images
+        setError(null);
     };
 
     // Calculate total counter weight
@@ -89,8 +128,8 @@ const EquipmentStockForm = () => {
             totalCounterWeight: total
         }));
     }, [formData.counterWeights]);
-
-    // Handle form submission
+    
+    // Handle form submission with chunked uploads
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
@@ -98,40 +137,58 @@ const EquipmentStockForm = () => {
         setSuccess(false);
 
         try {
-            // Create FormData object for file upload
-            const data = new FormData();
-            data.append('equipmentName', formData.equipmentName);
-            data.append('equipmentNo', formData.equipmentNo);
-            data.append('totalCounterWeight', formData.totalCounterWeight);
-
-            // Add counter weights
-            data.append('counterWeights', JSON.stringify(formData.counterWeights));
-
-            // Add images
-            formData.images.forEach((image, index) => {
-                data.append('images', image);
-            });
-
-            fetch('http://localhost:3001/stocks/add-handover-report', {
+            // First send the basic equipment data
+            const equipmentData = {
+                equipmentName: formData.equipmentName,
+                equipmentNo: formData.equipmentNo,
+                totalCounterWeight: formData.totalCounterWeight,
+                counterWeights: formData.counterWeights
+            };
+            
+            // First request - send equipment data without images
+            const equipmentResponse = await fetch('http://localhost:3001/stocks/add-handover-report', {
                 method: "POST",
                 headers: {
-                    "Accept": "*/*",
-                    'Content-Type': 'application/json'
+                    "Content-Type": 'application/json',
+                    "Accept": "*/*"
                 },
-                body: data
-            }).then((result) => result.json())
-                .then((data) => {
-                    console.log('Saved successfully:', data);
-                    setSuccess(true);
-                    setFormData({
-                        equipmentName: '',
-                        equipmentNo: '',
-                        counterWeights: [{ weight: '' }],
-                        totalCounterWeight: 0,
-                        images: []
-                    })
-                });
-
+                body: JSON.stringify(equipmentData)
+            });
+            
+            if (!equipmentResponse.ok) {
+                throw new Error('Failed to save equipment data');
+            }
+            
+            const equipmentResult = await equipmentResponse.json();
+            const equipmentId = equipmentResult.id; // Assuming your API returns the created equipment ID
+            
+            // Then upload images individually if there are any
+            if (formData.images.length > 0) {
+                for (let i = 0; i < formData.images.length; i++) {
+                    const imageData = new FormData();
+                    imageData.append('equipmentId', equipmentId);
+                    imageData.append('image', formData.images[i]);
+                    
+                    const imageResponse = await fetch('http://localhost:3001/stocks/add-equipment-image', {
+                        method: "POST",
+                        body: imageData
+                    });
+                    
+                    if (!imageResponse.ok) {
+                        throw new Error(`Failed to upload image ${i+1}`);
+                    }
+                }
+            }
+            
+            // Success handling
+            setSuccess(true);
+            setFormData({
+                equipmentName: '',
+                equipmentNo: '',
+                counterWeights: [{ weight: '' }],
+                totalCounterWeight: 0,
+                images: []
+            });
         } catch (err) {
             setError(err.message || 'An error occurred');
             console.error('Error:', err);
@@ -215,7 +272,7 @@ const EquipmentStockForm = () => {
                 </div>
 
                 <div className="form-group">
-                    <label>Equipment Photos</label>
+                    <label>Equipment Photos (Max: 10 images, 2MB per image, 20MB total)</label>
                     <input
                         type="file"
                         accept="image/*"
@@ -245,6 +302,10 @@ const EquipmentStockForm = () => {
                     {formData.images.length > 0 && (
                         <div className="image-count">
                             {formData.images.length} image(s) selected
+                            <span className="file-size">
+                                {" - "}
+                                {(formData.images.reduce((sum, img) => sum + img.size, 0) / (1024 * 1024)).toFixed(2)}MB
+                            </span>
                         </div>
                     )}
                 </div>

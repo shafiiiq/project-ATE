@@ -19,7 +19,7 @@ const StocksNavigation = () => {
         <div className="navigation-boxes">
           <div 
             className="navigation-box equipment-box"
-            onClick={() => handleNavigation('/stocks/equipment')}
+            onClick={() => handleNavigation('/stocks/eqipment-stocks')}
           >
             <div className="box-content">
               <div className="box-icon">

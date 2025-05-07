@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import './ServiceDoc.css';
 import logoImage from '../../assets/images/al-ansari.png';
+import alAnsariText from '../../assets/images/al-ansari-text.png';
 import sign from '../../assets/images/sign.jpg';
 import { useParams, useNavigate } from 'react-router-dom';
 
@@ -86,20 +87,9 @@ const ServiceDoc = () => {
           <div className="logo-placeholder">
             <img src={logoImage} alt="Company Logo" />
           </div>
+          
           <div className="company-details-s">
-            <div className="company-name-s">AI Ansari Transport & Enterprises W.L.L</div>
-            <div>Office No.2 Floor No.1 Gate No.3 Town Centre</div>
-            <div>Bin Omran, Doha, Qatar, P.O BOX-1265</div>
-            <div className="contract-wrap-s">
-              <div className="phone-s">
-                <span>Tel: +974 44505 700/800</span>
-                <span>Fax: +974 44505 900</span>
-              </div>
-              <div className="email-s">
-                <span>info@ansarigroup.co</span>
-                <span>www.ansarigroup.co</span>
-              </div>
-            </div>
+            <img src={alAnsariText} alt="AL Ansari Transport & Enterprises W.L.L" />
           </div>
         </div>
 

@@ -2,21 +2,41 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import './ServiceForm.css';
-import equipments from '../../equipments';
 
 const ServiceForm = ({ initialData = {} }) => {
   const navigate = useNavigate();
   const { regNo } = useParams();
+  const { date } = useParams();
+  const { serviceHrs } = useParams();
+  const { nextServiceHrs } = useParams();
+  const [equipments, setEquipments] = useState([]);
+
+  useEffect(() => {
+    fetch('http://localhost:3001/equipments/get-equipments', {
+      method: "GET",
+      headers: {
+        "Accept": "*/*",
+        'Content-Type': 'application/json'
+      },
+    })
+      .then((result) => result.json())
+      .then((data) => {
+        setEquipments(data.data);
+      })
+      .catch(error => {
+        console.error(`Error fetching equipment records:`, error);
+      });
+  }, []);
 
   // Form data state
   const [formData, setFormData] = useState({
-    serviceHrs: initialData.serviceHrs || '',
+    serviceHrs: serviceHrs || '',
     regNo: regNo || '',
-    nextServiceHrs: initialData.nextServiceHrs || '',
+    nextServiceHrs: nextServiceHrs || '',
     machine: initialData.machine || '',
     mechanics: initialData.mechanics || '',
     location: initialData.location || '',
-    date: initialData.date || new Date().toISOString().split('T')[0],
+    date: date || new Date().toISOString().split('T')[0],
     operatorName: initialData.operatorName || '',
     remarks: initialData.remarks || '',
   });
@@ -58,27 +78,23 @@ const ServiceForm = ({ initialData = {} }) => {
     { id: 33, description: 'Change Drive Belt', status: '' },
   ]);
 
-  // Auto-fill fields when equipment number changes
   useEffect(() => {
-    if (formData.regNo) {
+    if (equipments.length > 0 && formData.regNo) {
       const regNo = formData.regNo.trim();
-
-      // Find the equipment with matching regNo
       const foundEquipment = equipments.find(
         (equipment) => equipment.regNo === regNo
       );
 
       if (foundEquipment) {
-        // Update machine and operator name (certificationBody)
         setFormData({
           ...formData,
           machine: foundEquipment.machine || '',
-          operatorName: foundEquipment.certificationBody || '',
+          operatorName: foundEquipment.certificationBody[foundEquipment.certificationBody.length - 1] || '',
         });
       }
     }
-  }, [formData.regNo]);
-
+  }, [equipments]);
+  
   // Handle form input changes
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -258,7 +274,6 @@ const ServiceForm = ({ initialData = {} }) => {
                   value={formData.operatorName}
                   onChange={handleInputChange}
                   required
-                  readOnly={formData.regNo.trim() !== ''}
                 />
               </div>
             </div>

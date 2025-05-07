@@ -1,0 +1,214 @@
+.equipment-update {
+    font-family: Arial, sans-serif;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.header-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+h1 {
+    text-align: center;
+    font-size: 34px;
+    margin-bottom: 10px;
+    text-transform: uppercase;
+    color: #333;
+}
+
+.datetime-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin-bottom: 20px;
+    justify-content: space-between;
+    width: 100%;
+
+}
+
+.animated-time {
+    font-size: 20px;
+    font-weight: bold;
+    color: #0066cc;
+    position: relative;
+    padding: 5px 15px;
+    border-radius: 4px;
+    background-color: #f0f8ff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(0, 102, 204, 0.4);
+    }
+
+    70% {
+        box-shadow: 0 0 0 10px rgba(0, 102, 204, 0);
+    }
+
+    100% {
+        box-shadow: 0 0 0 0 rgba(0, 102, 204, 0);
+    }
+}
+
+.date {
+    font-size: 25px;
+    color: #666;
+    margin-top: 5px;
+    font-weight: 700;
+}
+
+.controls-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.committed {
+    background-color: #0066cc;
+    color: white;
+}
+
+.idle {
+    background-color: #008800;
+    color: white;
+}
+
+.search-container {
+    flex: 1;
+    max-width: 400px;
+}
+
+.search-input {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.print-button {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s;
+}
+
+.print-button:hover {
+    background-color: #45a049;
+}
+
+h3 {
+    font-size: 18px;
+    margin-bottom: 10px;
+    color: #333;
+    text-transform: uppercase;
+    border-bottom: 2px solid white;
+    padding-bottom: 5px;
+    padding-left: 1rem;
+    padding-top: 0.5rem;
+}
+
+.section {
+    margin-bottom: 40px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+th,
+td {
+    border: 1px solid #ddd;
+    padding: 8px 12px;
+    text-align: left;
+}
+
+th {
+    background-color: #f2f2f2;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+tr:hover {
+    background-color: #f1f1f1;
+}
+
+/* Status color coding */
+td:last-child {
+    font-weight: bold;
+}
+
+td:last-child:contains("Committed") {
+    color: #0066cc;
+}
+
+td:last-child:contains("Ready for work") {
+    color: #008800;
+}
+
+td:last-child:contains("Need to check") {
+    color: #cc6600;
+}
+
+.no-results {
+    text-align: center;
+    font-style: italic;
+    color: #999;
+    padding: 15px;
+}
+
+@media print {
+    .equipment-update {
+        padding: 0;
+    }
+
+    .header-section {
+        margin-bottom: 15px;
+    }
+
+    .controls-section {
+        display: none;
+    }
+
+    .animated-time {
+        animation: none;
+        box-shadow: none;
+        background-color: transparent;
+        color: #333;
+    }
+
+    h1,
+    .datetime-container {
+        text-align: center;
+    }
+
+    table {
+        page-break-inside: avoid;
+    }
+
+    /* Print header with date and time */
+    .equipment-update::before {
+        content: "Printed on: " attr(data-print-date);
+        display: block;
+        text-align: right;
+        font-size: 12px;
+        margin-bottom: 10px;
+    }
+}

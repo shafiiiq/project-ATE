@@ -897,7 +897,7 @@
         "istimaraExpiry": "1/27/2026",
         "insuranceExpiry": "2/19/2026",
         "tpcExpiry": "8/26/2025",
-        "certificationBody": "TUV SUD"
+        "certificationBody": "Ramesh thing"
     },
     {
         "id": 76,

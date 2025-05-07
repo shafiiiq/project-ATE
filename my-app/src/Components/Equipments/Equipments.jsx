@@ -14,6 +14,18 @@ function Equipments() {
   const [operatorsData, setOperatorsData] = useState([]);
   const [hoveredOperator, setHoveredOperator] = useState(null);
   
+  // New states for outside equipment functionality
+  const [showOutsideEquipmentModal, setShowOutsideEquipmentModal] = useState(false);
+  const [notFoundSearchTerm, setNotFoundSearchTerm] = useState('');
+  const [outsideEquipmentForm, setOutsideEquipmentForm] = useState({
+    machine: '',
+    regNo: '',
+    brand: '',
+    operator: '',
+    company: 'OUTSIDE',
+    outside: true
+  });
+  
   const navigate = useNavigate();
   const tableRef = useRef(null);
 
@@ -32,9 +44,7 @@ function Equipments() {
       .then((result) => result.json())
       .then((data) => {
         setEquipments(data.data);
-        setFilteredData(data.data);
-        console.log(data.data[0].certificationBody[data.data[0].certificationBody.length-1]);
-        
+        setFilteredData(data.data);        
       })
       .catch(error => {
         console.error(`Error fetching equipment records:`, error);
@@ -58,6 +68,29 @@ function Equipments() {
 
   const handleClearSearch = () => {
     setSearchTerm('');
+  };
+
+  // Modified search submit functionality
+  const handleSearchSubmit = (e) => {
+    e.preventDefault();
+    
+    if (!searchTerm.trim()) return;
+    
+    // Check if we have any matches for the search term focusing on regNo
+    const foundEquipment = equipments.find(item => 
+      item.regNo.toLowerCase() === searchTerm.toLowerCase()
+    );
+    
+    // If not found, show the add outside equipment modal
+    if (!foundEquipment && searchTerm.trim()) {
+      setNotFoundSearchTerm(searchTerm);
+      // Pre-populate the form with the searched regNo
+      setOutsideEquipmentForm({
+        ...outsideEquipmentForm,
+        regNo: searchTerm
+      });
+      setShowOutsideEquipmentModal(true);
+    }
   };
 
   const handleRowClick = (regNo) => {
@@ -108,9 +141,29 @@ function Equipments() {
   };
 
   // Navigation handlers for action buttons
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editEquipment, setEditEquipment] = useState(null);
+  const [editFormData, setEditFormData] = useState({
+    machine: '',
+    regNo: '',
+    brand: '',
+    year: '',
+    company: '',
+    operator: ''
+  });
+
   const handleEdit = (e, equipment) => {
     e.stopPropagation(); // Prevent row click event
-    navigate(`/update-equipment/${equipment.regNo}`, { state: { equipment } });
+    setEditEquipment(equipment);
+    setEditFormData({
+      machine: equipment.machine,
+      regNo: equipment.regNo,
+      brand: equipment.brand,
+      year: equipment.year,
+      company: equipment.company,
+      operator: equipment.certificationBody[equipment.certificationBody.length - 1] || ''
+    });
+    setShowEditModal(true);
   };
 
   const handleDeleteClick = (e, equipment) => {
@@ -171,13 +224,84 @@ function Equipments() {
     navigate('/add-equipment');
   };
 
+  // Handle form input changes for edit modal
+  const handleEditInputChange = (e) => {
+    const { name, value } = e.target;
+    setEditFormData({
+      ...editFormData,
+      [name]: value
+    });
+  };
+
+  // Handle form submission for updating equipment
+  const handleUpdateEquipment = (e) => {
+    e.preventDefault();
+    
+    if (!editEquipment) return;
+
+    // Create updated equipment object
+    const updatedEquipment = {
+      ...editEquipment,
+      machine: editFormData.machine,
+      regNo: editFormData.regNo,
+      brand: editFormData.brand,
+      year: editFormData.year, 
+      company: editFormData.company
+    };
+
+    // Only update certificationBody array if operator is different from the last one
+    if (editFormData.operator !== editEquipment.certificationBody[editEquipment.certificationBody.length - 1]) {
+      updatedEquipment.certificationBody = [...editEquipment.certificationBody, editFormData.operator];
+    }
+    
+    // Send update request to the server
+    fetch(`http://localhost:3001/equipments/update-equipment/${editEquipment.regNo}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(updatedEquipment)
+    })
+    .then(response => response.json())
+    .then(data => {
+      setShowEditModal(false);
+      if (data.ok) {
+        setDeleteStatus({
+          message: `Equipment ${editEquipment.regNo} successfully updated.`,
+          isError: false
+        });
+        // Refresh the equipment list
+        fetchEquipments();
+      } else {
+        setDeleteStatus({
+          message: data.message || 'Failed to update equipment.',
+          isError: true
+        });
+      }
+      setShowStatusModal(true);
+    })
+    .catch(error => {
+      setShowEditModal(false);
+      setDeleteStatus({
+        message: 'Error updating equipment: ' + error.message,
+        isError: true
+      });
+      setShowStatusModal(true);
+      console.error('Error updating equipment:', error);
+    });
+  };
+
+  // Close edit modal
+  const closeEditModal = () => {
+    setShowEditModal(false);
+    setEditEquipment(null);
+  };
+
   // Handle showing all operators in the certificationBody array
   const handleViewAllOperators = (e, operators) => {
     e.stopPropagation(); // Prevent row click event
     setOperatorsData(operators);
     setShowOperatorsModal(true);
-    console.log("this e", e , "event");
-    
   };
 
   const closeOperatorsModal = () => {
@@ -186,12 +310,86 @@ function Equipments() {
   };
 
   // Handle hover state for operator cells
-  const handleOperatorMouseEnter = (equipmentId) => {    
+  const handleOperatorMouseEnter = (equipmentId) => {
     setHoveredOperator(equipmentId);
   };
 
   const handleOperatorMouseLeave = () => {
     setHoveredOperator(null);
+  };
+
+  // Handle Outside Equipment form input changes
+  const handleOutsideEquipmentInputChange = (e) => {
+    const { name, value } = e.target;
+    setOutsideEquipmentForm({
+      ...outsideEquipmentForm,
+      [name]: value
+    });
+  };
+
+  // Handle Outside Equipment form submission
+  const handleAddOutsideEquipment = (e) => {
+    e.preventDefault();
+    
+    // Create the outside equipment object with certificationBody as an array
+    const newOutsideEquipment = {
+      ...outsideEquipmentForm,
+      certificationBody: [outsideEquipmentForm.operator]
+    };
+    
+    // Remove the single operator property as it's now in the array
+    delete newOutsideEquipment.operator;
+    
+    // Send request to add the outside equipment
+    fetch('http://localhost:3001/equipments/add-equipment', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(newOutsideEquipment)
+    })
+    .then(response => response.json())
+    .then(data => {
+      setShowOutsideEquipmentModal(false);
+      if (data.ok) {
+        setDeleteStatus({
+          message: `Outside equipment ${outsideEquipmentForm.regNo} successfully added.`,
+          isError: false
+        });
+        // Reset form
+        setOutsideEquipmentForm({
+          machine: '',
+          regNo: '',
+          brand: '',
+          operator: '',
+          company: 'OUTSIDE',
+          outside: true
+        });
+        // Refresh the equipment list
+        fetchEquipments();
+      } else {
+        setDeleteStatus({
+          message: data.message || 'Failed to add outside equipment.',
+          isError: true
+        });
+      }
+      setShowStatusModal(true);
+    })
+    .catch(error => {
+      setShowOutsideEquipmentModal(false);
+      setDeleteStatus({
+        message: 'Error adding outside equipment: ' + error.message,
+        isError: true
+      });
+      setShowStatusModal(true);
+      console.error('Error adding outside equipment:', error);
+    });
+  };
+
+  // Close outside equipment modal
+  const closeOutsideEquipmentModal = () => {
+    setShowOutsideEquipmentModal(false);
+    setNotFoundSearchTerm('');
   };
 
   return (
@@ -263,8 +461,10 @@ function Equipments() {
                     onMouseLeave={handleOperatorMouseLeave}
                     onClick={(e) => e.stopPropagation()}
                   >
-                    {item.certificationBody[item.certificationBody.length - 1]}
-                    {item.certificationBody.length >= 1 && hoveredOperator === item.id && (
+                    {item.certificationBody && item.certificationBody.length > 0 
+                      ? item.certificationBody[item.certificationBody.length - 1]
+                      : ''}
+                    {item.certificationBody && item.certificationBody.length >= 1 && hoveredOperator === item.id && (
                       <div className="view-all-overlay">
                         <button 
                           className="view-all-button"
@@ -294,7 +494,25 @@ function Equipments() {
             ) : (
               <tr>
                 <td colSpan="8" className="no-results">
-                  {equipments.length > 0 ? 'No matching records found' : 'Loading equipment data...'}
+                  {equipments.length > 0 ? (
+                    searchTerm ? (
+                      <>
+                        No matching records found for <span className='not-found-outside-equip'>{searchTerm}</span>. 
+                        <button 
+                          className="add-outside-button"
+                          onClick={() => {
+                            setOutsideEquipmentForm({
+                              ...outsideEquipmentForm,
+                              regNo: searchTerm
+                            });
+                            setShowOutsideEquipmentModal(true);
+                          }}
+                        >
+                          Add as Outside Equipment
+                        </button>
+                      </>
+                    ) : 'No matching records found'
+                  ) : 'Loading equipment data...'}
                 </td>
               </tr>
             )}
@@ -337,6 +555,91 @@ function Equipments() {
           </div>
         </div>
       )}
+      
+      {/* Edit Equipment Modal */}
+      {showEditModal && (
+        <div className="modal-overlay">
+          <div className="modal-content edit-modal">
+            <div className="modal-header">
+              <h2>Update Equipment</h2>
+            </div>
+            <div className="modal-body">
+              <form onSubmit={handleUpdateEquipment} className="edit-form">
+                <div className="form-group">
+                  <label htmlFor="machine">Machine:</label>
+                  <input
+                    type="text"
+                    id="machine"
+                    name="machine"
+                    value={editFormData.machine}
+                    onChange={handleEditInputChange}
+                    required
+                  />
+                </div>
+                <div className="form-group">
+                  <label htmlFor="regNo">Registration No:</label>
+                  <input
+                    type="text"
+                    id="regNo"
+                    name="regNo"
+                    value={editFormData.regNo}
+                    onChange={handleEditInputChange}
+                    required
+                  />
+                </div>
+                <div className="form-group">
+                  <label htmlFor="brand">Brand:</label>
+                  <input
+                    type="text"
+                    id="brand"
+                    name="brand"
+                    value={editFormData.brand}
+                    onChange={handleEditInputChange}
+                    required
+                  />
+                </div>
+                <div className="form-group">
+                  <label htmlFor="year">Year:</label>
+                  <input
+                    type="text"
+                    id="year"
+                    name="year"
+                    value={editFormData.year}
+                    onChange={handleEditInputChange}
+                    required
+                  />
+                </div>
+                <div className="form-group">
+                  <label htmlFor="company">Company:</label>
+                  <input
+                    type="text"
+                    id="company"
+                    name="company"
+                    value={editFormData.company}
+                    onChange={handleEditInputChange}
+                    required
+                  />
+                </div>
+                <div className="form-group">
+                  <label htmlFor="operator">Operator:</label>
+                  <input
+                    type="text"
+                    id="operator"
+                    name="operator"
+                    value={editFormData.operator}
+                    onChange={handleEditInputChange}
+                    required
+                  />
+                </div>
+              </form>
+            </div>
+            <div className="modal-footer">
+              <button className="cancel-button" onClick={closeEditModal}>Cancel</button>
+              <button className="save-button" onClick={handleUpdateEquipment}>Save Changes</button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Operators Modal */}
       {showOperatorsModal && (
@@ -371,6 +674,74 @@ function Equipments() {
             </div>
             <div className="modal-footer">
               <button className="ok-button" onClick={closeOperatorsModal}>Close</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Add Outside Equipment Modal */}
+      {showOutsideEquipmentModal && (
+        <div className="modal-overlay">
+          <div className="modal-content outside-equipment-modal">
+            <div className="modal-header">
+              <h2>Add Outside Equipment</h2>
+            </div>
+            <div className="modal-body">
+              <form onSubmit={handleAddOutsideEquipment} className="edit-form">
+                <div className="form-group">
+                  <label htmlFor="machine">Machine:</label>
+                  <input
+                    type="text"
+                    id="machine"
+                    name="machine"
+                    value={outsideEquipmentForm.machine}
+                    onChange={handleOutsideEquipmentInputChange}
+                    required
+                  />
+                </div>
+                <div className="form-group">
+                  <label htmlFor="regNo">Registration No:</label>
+                  <input
+                    type="text"
+                    id="regNo"
+                    name="regNo"
+                    value={outsideEquipmentForm.regNo}
+                    onChange={handleOutsideEquipmentInputChange}
+                    required
+                  />
+                </div>
+                <div className="form-group">
+                  <label htmlFor="brand">Brand:</label>
+                  <input
+                    type="text"
+                    id="brand"
+                    name="brand"
+                    value={outsideEquipmentForm.brand}
+                    onChange={handleOutsideEquipmentInputChange}
+                    required
+                  />
+                </div>
+                <div className="form-group">
+                  <label htmlFor="operator">Operator:</label>
+                  <input
+                    type="text"
+                    id="operator"
+                    name="operator"
+                    value={outsideEquipmentForm.operator}
+                    onChange={handleOutsideEquipmentInputChange}
+                    required
+                  />
+                </div>
+                <div className="form-group">
+                  <p className="outside-note">
+                    <strong>Note:</strong> This equipment will be marked as an outside equipment with company "OUTSIDE".
+                  </p>
+                </div>
+              </form>
+            </div>
+            <div className="modal-footer">
+              <button className="cancel-button" onClick={closeOutsideEquipmentModal}>Cancel</button>
+              <button className="save-button" onClick={handleAddOutsideEquipment}>Add Equipment</button>
             </div>
           </div>
         </div>

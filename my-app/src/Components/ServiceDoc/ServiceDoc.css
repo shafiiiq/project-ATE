@@ -37,14 +37,16 @@ body {
   object-fit: contain;
   /* position: absolute;
   left: 1rem; */
-  margin-left: 11.5rem;
+  margin-left: 10.5rem;
 }
 
 .company-details-s {
-  text-align: left;
-  font-size: 12px;
-  line-height: 1.4;
-  margin-right: 2rem;
+  margin-top: 2rem;
+  margin-right: 1.5rem;
+}
+
+.company-details-s img {
+  width: 22rem;
 }
 
 .report-container {
@@ -148,7 +150,7 @@ body {
   padding-left: 0.5rem;
 }
 
-.contract-wrap-s > div {
+.contract-wrap-s>div {
   display: flex;
   flex-direction: column;
 }

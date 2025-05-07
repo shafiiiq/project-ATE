@@ -263,7 +263,7 @@ function ServiceHistory(props) {
                       <td>{item.waterSeparator}</td>
                       <td>{item.airFilter}</td>
                       <td>{item.serviceHrs}</td>
-                      <td>{item.nextServiceHrs}</td>
+                      {item.nextServiceHrs === 0 ? ' ' : <td>{item.nextServiceHrs}</td> }
                      { item.fullService ?  <td>{item.serviceHrs + 3000}</td> :  <td></td>}
                      { item.fullService ?  <td>{item.remarks}</td> :  <td></td>}
                     </>

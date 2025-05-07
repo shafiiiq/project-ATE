@@ -107,8 +107,9 @@ function ServiceHistoryForm() {
     })
       .then((result) => result.json())
       .then((data) => {
-        console.log("Service record added successfully:", data);
-        alert("Service record added successfully!");
+        // console.log("Service record added successfully:", data);
+        // alert("Service record added successfully!");
+        navigate(`/service-form/${formData.regNo}/${formData.date}/${formData.serviceHrs}/${formData.nextServiceHrs}`)
       })
       .catch(error => {
         console.error("Error adding service record:", error);

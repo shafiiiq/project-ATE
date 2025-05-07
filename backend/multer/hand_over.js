@@ -36,35 +36,31 @@ const upload = multer({
   storage: storage,
   fileFilter: fileFilter,
   limits: {
-    fileSize: 5 * 1024 * 1024, // 5MB max file size
+    fileSize: 2 * 2048 * 2048, // 2MB max file size to match frontend limit
     files: 10 // maximum 10 files at once
   }
 });
 
-// Process uploaded files and add them to the request body
-const uploadEquipmentImages = (req, res, next) => {
-  upload.array('images', 10)(req, res, (err) => {
-    if (err instanceof multer.MulterError) {
-      return res.status(400).json({ 
-        success: false, 
-        message: `Upload error: ${err.message}` 
-      });
-    } else if (err) {
-      return res.status(400).json({ 
-        success: false, 
-        message: err.message 
-      });
+// Middleware for handling equipment data only (no file uploads)
+const processEquipmentData = (req, res, next) => {
+  // Parse JSON data if needed
+  try {
+    if (typeof req.body === 'string') {
+      req.body = JSON.parse(req.body);
     }
-    
-    // Add image paths to the request body
-    if (req.files && req.files.length > 0) {
-      req.body.images = req.files.map(file => file.path);
-    }
-    
     next();
-  });
+  } catch (err) {
+    return res.status(400).json({
+      success: false,
+      message: `Error parsing request data: ${err.message}`
+    });
+  }
 };
 
+// Middleware for handling image uploads
+const uploadEquipmentImages = upload.single('image');
+
 module.exports = {
+  processEquipmentData,
   uploadEquipmentImages
 };

@@ -25,10 +25,10 @@ const getEquipments = async (req, res) => {
 }
 
 const updateEquipments = async (req, res) => {
-  const { id } = req.params;
+  const { regNo } = req.params;
   const updateData = req.body;
 
-  userServices.updateEquipments(id, updateData)
+  userServices.updateEquipments(regNo, updateData)
     .then((updatedUser) => {
       if (updatedUser) {
         res.status(updatedUser.status).json(updatedUser)

@@ -7,7 +7,7 @@ const counterWeightSchema = new mongoose.Schema({
   }
 });
 
-const EquipmentStocksSchema = new mongoose.Schema({
+const equipmentHandoverSchema = new mongoose.Schema({
   equipmentName: {
     type: String,
     required: true,
@@ -16,19 +16,27 @@ const EquipmentStocksSchema = new mongoose.Schema({
   equipmentNo: {
     type: String,
     required: true,
-    trim: true,
-    unique: true
+    unique: true,
+    trim: true
   },
-  counterWeights: [counterWeightSchema],
+  counterWeights: {
+    type: [counterWeightSchema],
+    required: true,
+    validate: {
+      validator: function(array) {
+        return array && array.length > 0;
+      },
+      message: 'At least one counter weight is required'
+    }
+  },
   totalCounterWeight: {
     type: Number,
-    required: true,
-    default: 0
-  },
-  images: [{
-    type: String,
     required: true
-  }],
+  },
+  images: {
+    type: [String], // Array of image paths
+    default: []
+  },
   createdAt: {
     type: Date,
     default: Date.now
@@ -39,6 +47,15 @@ const EquipmentStocksSchema = new mongoose.Schema({
   }
 });
 
+// Pre-save hook to ensure totalCounterWeight is calculated correctly
+equipmentHandoverSchema.pre('save', function(next) {
+  // Calculate total counter weight from individual weights
+  if (this.counterWeights && this.counterWeights.length > 0) {
+    this.totalCounterWeight = this.counterWeights.reduce((total, item) => {
+      return total + (parseFloat(item.weight) || 0);
+    }, 0);
+  }
+  next();
+});
 
-
-module.exports = mongoose.model('EquipmentStocks', EquipmentStocksSchema);
+module.exports = mongoose.model('EquipmentHandover', equipmentHandoverSchema);

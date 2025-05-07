@@ -41,7 +41,7 @@ module.exports = {
   fetchEquipments: () => {
     return new Promise(async (resolve, reject) => {
       try {
-        const getusers = await equipmentModel.find({});
+        const getusers = await equipmentModel.find({outside: false});
         resolve({
           status: 200,
           ok: true,
@@ -57,34 +57,47 @@ module.exports = {
     });
   },
 
-  updateEquipments: (id, updateData) => {
+  updateEquipments: (regNo, updatedData) => {
     return new Promise(async (resolve, reject) => {
+
+      console.log(updatedData);
+      
       try {
-        const validUser = await equipmentModel.findById(id);
-        if (validUser) {
-          const updatedUser = await equipmentModel.findByIdAndUpdate(id, updateData);
-          return resolve({
-            status: 200,
-            ok: true,
-            message: 'User updated successfully',
-            data: updatedUser
-          });
+
+        const equipment = await equipmentModel.findOne({ regNo: regNo });
+        if (!equipment) {
+          return reject({ status: 404, ok: false, message: 'Equipment not found' });
         }
-      } catch (error) {
-        reject({
-          status: 500,
-          ok: false,
-          message: 'unable to update user'
+
+        if (updatedData.operator) {
+          if (!equipment.certificationBody) equipment.certificationBody = [];
+
+          equipment.certificationBody.push(updatedData.operator);
+          delete updatedData.operator;
+        }
+
+        Object.assign(equipment, updatedData);
+
+        await equipment.save();
+
+        resolve({
+          status: 200,
+          ok: true,
+          message: 'Equipment updated successfully',
+          data: equipment
         });
+      } catch (error) {
+        reject({ status: 500, ok: false, message: 'Unable to update equipment' });
       }
     });
   },
+
   deleteEquipments: (regNo) => {
     return new Promise(async (resolve, reject) => {
       try {
-        const validUser = await equipmentModel.findOne({regNo: regNo});
+        const validUser = await equipmentModel.findOne({ regNo: regNo });
         if (validUser) {
-          const deleteUser = await equipmentModel.findOneAndDelete({regNo : regNo});
+          const deleteUser = await equipmentModel.findOneAndDelete({ regNo: regNo });
           return resolve({
             status: 200,
             ok: true,

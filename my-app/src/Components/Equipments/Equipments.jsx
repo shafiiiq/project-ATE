@@ -13,8 +13,7 @@ function Equipments() {
   const [showOperatorsModal, setShowOperatorsModal] = useState(false);
   const [operatorsData, setOperatorsData] = useState([]);
   const [hoveredOperator, setHoveredOperator] = useState(null);
-  
-  // New states for outside equipment functionality
+  const [currentDateTime, setCurrentDateTime] = useState('');
   const [showOutsideEquipmentModal, setShowOutsideEquipmentModal] = useState(false);
   const [notFoundSearchTerm, setNotFoundSearchTerm] = useState('');
   const [outsideEquipmentForm, setOutsideEquipmentForm] = useState({
@@ -28,6 +27,34 @@ function Equipments() {
   
   const navigate = useNavigate();
   const tableRef = useRef(null);
+
+  // Get current date and time
+  useEffect(() => {
+    const updateDateTime = () => {
+      const now = new Date();
+      
+      // Format date as DD-MM-YY
+      const day = String(now.getDate()).padStart(2, '0');
+      const month = String(now.getMonth() + 1).padStart(2, '0');
+      const year = String(now.getFullYear()).slice(-2);
+      const dateString = `${day}-${month}-${year}`;
+      
+      // Format time in AM/PM
+      let hours = now.getHours();
+      const minutes = String(now.getMinutes()).padStart(2, '0');
+      const ampm = hours >= 12 ? 'PM' : 'AM';
+      hours = hours % 12;
+      hours = hours ? hours : 12;
+      const timeString = `${hours}:${minutes} ${ampm}`;
+      
+      setCurrentDateTime(`${dateString}   |   ${timeString}`);
+    };
+
+    updateDateTime();
+    const interval = setInterval(updateDateTime, 60000);
+    
+    return () => clearInterval(interval);
+  }, []);
 
   useEffect(() => {
     fetchEquipments();
@@ -70,21 +97,17 @@ function Equipments() {
     setSearchTerm('');
   };
 
-  // Modified search submit functionality
   const handleSearchSubmit = (e) => {
     e.preventDefault();
     
     if (!searchTerm.trim()) return;
     
-    // Check if we have any matches for the search term focusing on regNo
     const foundEquipment = equipments.find(item => 
       item.regNo.toLowerCase() === searchTerm.toLowerCase()
     );
     
-    // If not found, show the add outside equipment modal
     if (!foundEquipment && searchTerm.trim()) {
       setNotFoundSearchTerm(searchTerm);
-      // Pre-populate the form with the searched regNo
       setOutsideEquipmentForm({
         ...outsideEquipmentForm,
         regNo: searchTerm
@@ -140,7 +163,6 @@ function Equipments() {
     };
   };
 
-  // Navigation handlers for action buttons
   const [showEditModal, setShowEditModal] = useState(false);
   const [editEquipment, setEditEquipment] = useState(null);
   const [editFormData, setEditFormData] = useState({
@@ -153,7 +175,7 @@ function Equipments() {
   });
 
   const handleEdit = (e, equipment) => {
-    e.stopPropagation(); // Prevent row click event
+    e.stopPropagation();
     setEditEquipment(equipment);
     setEditFormData({
       machine: equipment.machine,
@@ -167,7 +189,7 @@ function Equipments() {
   };
 
   const handleDeleteClick = (e, equipment) => {
-    e.stopPropagation(); // Prevent row click event
+    e.stopPropagation();
     setSelectedEquipment(equipment);
     setShowDeleteModal(true);
   };
@@ -189,7 +211,6 @@ function Equipments() {
           message: `Equipment ${selectedEquipment.regNo} successfully deleted.`,
           isError: false
         });
-        // Refresh the equipment list
         fetchEquipments();
       } else {
         setDeleteStatus({
@@ -224,7 +245,6 @@ function Equipments() {
     navigate('/add-equipment');
   };
 
-  // Handle form input changes for edit modal
   const handleEditInputChange = (e) => {
     const { name, value } = e.target;
     setEditFormData({
@@ -233,13 +253,11 @@ function Equipments() {
     });
   };
 
-  // Handle form submission for updating equipment
   const handleUpdateEquipment = (e) => {
     e.preventDefault();
     
     if (!editEquipment) return;
 
-    // Create updated equipment object
     const updatedEquipment = {
       ...editEquipment,
       machine: editFormData.machine,
@@ -249,12 +267,10 @@ function Equipments() {
       company: editFormData.company
     };
 
-    // Only update certificationBody array if operator is different from the last one
     if (editFormData.operator !== editEquipment.certificationBody[editEquipment.certificationBody.length - 1]) {
       updatedEquipment.certificationBody = [...editEquipment.certificationBody, editFormData.operator];
     }
     
-    // Send update request to the server
     fetch(`http://localhost:3001/equipments/update-equipment/${editEquipment.regNo}`, {
       method: 'PUT',
       headers: {
@@ -270,7 +286,6 @@ function Equipments() {
           message: `Equipment ${editEquipment.regNo} successfully updated.`,
           isError: false
         });
-        // Refresh the equipment list
         fetchEquipments();
       } else {
         setDeleteStatus({
@@ -291,15 +306,13 @@ function Equipments() {
     });
   };
 
-  // Close edit modal
   const closeEditModal = () => {
     setShowEditModal(false);
     setEditEquipment(null);
   };
 
-  // Handle showing all operators in the certificationBody array
   const handleViewAllOperators = (e, operators) => {
-    e.stopPropagation(); // Prevent row click event
+    e.stopPropagation();
     setOperatorsData(operators);
     setShowOperatorsModal(true);
   };
@@ -309,7 +322,6 @@ function Equipments() {
     setOperatorsData([]);
   };
 
-  // Handle hover state for operator cells
   const handleOperatorMouseEnter = (equipmentId) => {
     setHoveredOperator(equipmentId);
   };
@@ -318,7 +330,6 @@ function Equipments() {
     setHoveredOperator(null);
   };
 
-  // Handle Outside Equipment form input changes
   const handleOutsideEquipmentInputChange = (e) => {
     const { name, value } = e.target;
     setOutsideEquipmentForm({
@@ -327,20 +338,16 @@ function Equipments() {
     });
   };
 
-  // Handle Outside Equipment form submission
   const handleAddOutsideEquipment = (e) => {
     e.preventDefault();
     
-    // Create the outside equipment object with certificationBody as an array
     const newOutsideEquipment = {
       ...outsideEquipmentForm,
       certificationBody: [outsideEquipmentForm.operator]
     };
     
-    // Remove the single operator property as it's now in the array
     delete newOutsideEquipment.operator;
     
-    // Send request to add the outside equipment
     fetch('http://localhost:3001/equipments/add-equipment', {
       method: 'POST',
       headers: {
@@ -356,7 +363,6 @@ function Equipments() {
           message: `Outside equipment ${outsideEquipmentForm.regNo} successfully added.`,
           isError: false
         });
-        // Reset form
         setOutsideEquipmentForm({
           machine: '',
           regNo: '',
@@ -365,7 +371,6 @@ function Equipments() {
           company: 'OUTSIDE',
           outside: true
         });
-        // Refresh the equipment list
         fetchEquipments();
       } else {
         setDeleteStatus({
@@ -386,15 +391,18 @@ function Equipments() {
     });
   };
 
-  // Close outside equipment modal
   const closeOutsideEquipmentModal = () => {
     setShowOutsideEquipmentModal(false);
     setNotFoundSearchTerm('');
   };
 
   return (
-    <div className="container">
-      <h1 className="title">Equipment Inventory</h1>
+    <div className="equipment-container">
+      <div className="equipment-header">
+        <h1 className='equip-title'>Equipment Inventory</h1>
+        <div className="date-time">{currentDateTime}</div>
+      </div>
+      
       <div className="controls-container">
         <div className="search-container">
           <input
@@ -409,16 +417,20 @@ function Equipments() {
               ×
             </button>
           )}
+          <button onClick={handleSearchSubmit} className="search-button">
+            Search
+          </button>
         </div>
         <div className="buttons-container">
-          <button onClick={handleAdd} className="add-button">
+          <button onClick={handleAdd} className="action-btn add">
             Add Equipment
           </button>
-          <button onClick={handlePrint} className="print-button">
+          <button onClick={handlePrint} className="action-btn print">
             Print Table
           </button>
         </div>
       </div>
+
       <div className="table-info">
         {searchTerm ? (
           `Found ${filteredData?.length || 0} matching ${filteredData?.length === 1 ? 'entry' : 'entries'}`
@@ -427,7 +439,7 @@ function Equipments() {
         )}
       </div>
 
-      <div className="table-container">
+      <div className="equipment-table-container">
         <table className="equipment-table" ref={tableRef}>
           <thead>
             <tr>
@@ -477,13 +489,13 @@ function Equipments() {
                   </td>
                   <td className="actions-cell" onClick={(e) => e.stopPropagation()}>
                     <button 
-                      className="edit-button" 
+                      className="action-btn edit" 
                       onClick={(e) => handleEdit(e, item)}
                     >
                       Edit
                     </button>
                     <button 
-                      className="delete-button" 
+                      className="action-btn delete" 
                       onClick={(e) => handleDeleteClick(e, item)}
                     >
                       Delete
@@ -499,7 +511,7 @@ function Equipments() {
                       <>
                         No matching records found for <span className='not-found-outside-equip'>{searchTerm}</span>. 
                         <button 
-                          className="add-outside-button"
+                          className="action-btn outside"
                           onClick={() => {
                             setOutsideEquipmentForm({
                               ...outsideEquipmentForm,
@@ -526,14 +538,15 @@ function Equipments() {
           <div className="modal-content">
             <div className="modal-header">
               <h2>Confirm Deletion</h2>
+              <button className="close-btn" onClick={cancelDelete}>×</button>
             </div>
             <div className="modal-body">
               <p>Are you sure you want to delete the equipment with registration number <strong>{selectedEquipment?.regNo}</strong>?</p>
               <p>This action cannot be undone.</p>
             </div>
             <div className="modal-footer">
-              <button className="cancel-button" onClick={cancelDelete}>Cancel</button>
-              <button className="confirm-delete-button" onClick={confirmDelete}>Delete</button>
+              <button className="action-btn cancel" onClick={cancelDelete}>Cancel</button>
+              <button className="action-btn confirm-delete" onClick={confirmDelete}>Delete</button>
             </div>
           </div>
         </div>
@@ -542,15 +555,16 @@ function Equipments() {
       {/* Status Modal */}
       {showStatusModal && (
         <div className="modal-overlay">
-          <div className={`modal-content ${deleteStatus.isError ? 'error-modal' : 'success-modal'}`}>
+          <div className={`modal-content ${deleteStatus.isError ? 'error' : 'success'}`}>
             <div className="modal-header">
               <h2>{deleteStatus.isError ? 'Error' : 'Success'}</h2>
+              <button className="close-btn" onClick={closeStatusModal}>×</button>
             </div>
             <div className="modal-body">
               <p>{deleteStatus.message}</p>
             </div>
             <div className="modal-footer">
-              <button className="ok-button" onClick={closeStatusModal}>OK</button>
+              <button className="action-btn ok" onClick={closeStatusModal}>OK</button>
             </div>
           </div>
         </div>
@@ -559,9 +573,10 @@ function Equipments() {
       {/* Edit Equipment Modal */}
       {showEditModal && (
         <div className="modal-overlay">
-          <div className="modal-content edit-modal">
+          <div className="modal-content edit">
             <div className="modal-header">
               <h2>Update Equipment</h2>
+              <button className="close-btn" onClick={closeEditModal}>×</button>
             </div>
             <div className="modal-body">
               <form onSubmit={handleUpdateEquipment} className="edit-form">
@@ -634,8 +649,8 @@ function Equipments() {
               </form>
             </div>
             <div className="modal-footer">
-              <button className="cancel-button" onClick={closeEditModal}>Cancel</button>
-              <button className="save-button" onClick={handleUpdateEquipment}>Save Changes</button>
+              <button className="action-btn cancel" onClick={closeEditModal}>Cancel</button>
+              <button className="action-btn save" onClick={handleUpdateEquipment}>Save Changes</button>
             </div>
           </div>
         </div>
@@ -644,9 +659,10 @@ function Equipments() {
       {/* Operators Modal */}
       {showOperatorsModal && (
         <div className="modal-overlay">
-          <div className="modal-content operators-modal">
+          <div className="modal-content operators">
             <div className="modal-header">
               <h2>All Operators</h2>
+              <button className="close-btn" onClick={closeOperatorsModal}>×</button>
             </div>
             <div className="modal-body">
               {operatorsData.length > 0 ? (
@@ -673,7 +689,7 @@ function Equipments() {
               )}
             </div>
             <div className="modal-footer">
-              <button className="ok-button" onClick={closeOperatorsModal}>Close</button>
+              <button className="action-btn ok" onClick={closeOperatorsModal}>Close</button>
             </div>
           </div>
         </div>
@@ -682,9 +698,10 @@ function Equipments() {
       {/* Add Outside Equipment Modal */}
       {showOutsideEquipmentModal && (
         <div className="modal-overlay">
-          <div className="modal-content outside-equipment-modal">
+          <div className="modal-content outside">
             <div className="modal-header">
               <h2>Add Outside Equipment</h2>
+              <button className="close-btn" onClick={closeOutsideEquipmentModal}>×</button>
             </div>
             <div className="modal-body">
               <form onSubmit={handleAddOutsideEquipment} className="edit-form">
@@ -740,8 +757,8 @@ function Equipments() {
               </form>
             </div>
             <div className="modal-footer">
-              <button className="cancel-button" onClick={closeOutsideEquipmentModal}>Cancel</button>
-              <button className="save-button" onClick={handleAddOutsideEquipment}>Add Equipment</button>
+              <button className="action-btn cancel" onClick={closeOutsideEquipmentModal}>Cancel</button>
+              <button className="action-btn save" onClick={handleAddOutsideEquipment}>Add Equipment</button>
             </div>
           </div>
         </div>

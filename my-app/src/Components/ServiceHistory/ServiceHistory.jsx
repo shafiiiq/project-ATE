@@ -1,8 +1,8 @@
-import { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import './ServiceHistory.css';
 import { useParams, useNavigate } from 'react-router-dom';
 
-function ServiceHistory(props) {
+const ServiceHistory = (props) => {
   // Get the regNo from URL parameters and setup navigation
   const { regNo } = useParams();
   const navigate = useNavigate();
@@ -10,14 +10,45 @@ function ServiceHistory(props) {
   // Determine if this is maintenance view or regular service history
   const isMaintenance = props.maintanance === true;
 
-  // State for search functionality
+  // State for search functionality and data
   const [searchTerm, setSearchTerm] = useState('');
   const [filteredData, setFilteredData] = useState([]);
   const [equipmentData, setEquipmentData] = useState(null);
   const [serviceHistory, setServiceHistory] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [currentDateTime, setCurrentDateTime] = useState('');
 
   // Create a ref for the table to print
   const tableRef = useRef(null);
+
+  // Get current date in DD-MM-YY format and time in AM/PM format
+  useEffect(() => {
+    const updateDateTime = () => {
+      const now = new Date();
+      
+      // Format date as DD-MM-YY
+      const day = String(now.getDate()).padStart(2, '0');
+      const month = String(now.getMonth() + 1).padStart(2, '0');
+      const year = String(now.getFullYear()).slice(-2);
+      const dateString = `${day}-${month}-${year}`;
+      
+      // Format time in AM/PM
+      let hours = now.getHours();
+      const minutes = String(now.getMinutes()).padStart(2, '0');
+      const ampm = hours >= 12 ? 'PM' : 'AM';
+      hours = hours % 12;
+      hours = hours ? hours : 12; // Convert 0 to 12
+      const timeString = `${hours}:${minutes} ${ampm}`;
+      
+      setCurrentDateTime(`${dateString}   |   ${timeString}`);
+    };
+
+    updateDateTime();
+    const interval = setInterval(updateDateTime, 60000); // Update every minute
+    
+    return () => clearInterval(interval);
+  }, []);
 
   // Function to format date from YYYY-MM-DD to DD-MM-YYYY
   const formatDate = (dateString) => {
@@ -30,6 +61,7 @@ function ServiceHistory(props) {
 
   // First useEffect to fetch data
   useEffect(() => {
+    setLoading(true);
     // Define endpoint based on the view type
     const endpoint = isMaintenance 
       ? `http://localhost:3001/service-history/get-maintanance-history/${regNo}`
@@ -45,10 +77,12 @@ function ServiceHistory(props) {
       .then((result) => result.json())
       .then((data) => {
         setServiceHistory(data.data);
+        setLoading(false);
       })
       .catch(error => {
         console.error(`Error fetching ${isMaintenance ? 'maintenance' : 'service'} records:`, error);
-        alert(`Failed to fetch ${isMaintenance ? 'maintenance' : 'service'} records. Please try again.`);
+        setError(`Failed to fetch ${isMaintenance ? 'maintenance' : 'service'} records. Please try again.`);
+        setLoading(false);
       });
 
     // Try to find equipment details from your equipments data
@@ -104,7 +138,7 @@ function ServiceHistory(props) {
   };  
 
   const showTyreService = () => {
-      navigate(`/tyre-history/${regNo}`);
+    navigate(`/tyre-history/${regNo}`);
   };
 
   const handleRowClick = (date) => {
@@ -168,120 +202,165 @@ function ServiceHistory(props) {
     };
   };
 
-  return (
-    <div className="container">
-      <h1 className="title">
-        {isMaintenance ? 'Maintanance Service History' : 'Periodic Service History'}
-      </h1>
-      <h3 className="equipment">
-        {equipmentData
-          ? `${equipmentData.machine} - ${regNo}`
-          : `Equipment: ${regNo}`}
-      </h3>
+  // Count records by type
+  const recordCounts = {
+    all: filteredData.length,
+    fullService: filteredData.filter(item => item.fullService === true).length,
+    regular: filteredData.filter(item => !item.fullService && (!isMaintenance || item.workRemarks)).length,
+    maintenance: isMaintenance ? filteredData.length : 0
+  };
 
-      <div className="controls-container">
+  return (
+    <div className="service-history-container">
+      <div className="service-header">
+        <h1 className="service-title">
+          {isMaintenance ? 'Maintenance History' : 'Service History'}
+        </h1>
+        <div className="date-time">{currentDateTime}</div>
+      </div>
+
+      <div className="equipment-info">
+        {equipmentData ? (
+          <h2>{equipmentData.machine} - {regNo}</h2>
+        ) : (
+          <h2>Equipment: {regNo}</h2>
+        )}
+      </div>
+
+      <div className="filter-buttons">
+        <button 
+          className={`filter-btn ${searchTerm === '' ? 'active' : ''}`} 
+          onClick={handleClearSearch}
+        >
+          All ({recordCounts.all})
+        </button>
+        {!isMaintenance && (
+          <button 
+            className={`filter-btn full-service ${searchTerm === 'full' ? 'active' : ''}`} 
+            onClick={() => setSearchTerm('full')}
+          >
+            Full Service ({recordCounts.fullService})
+          </button>
+        )}
+        <button 
+          className={`filter-btn regular ${searchTerm === 'regular' ? 'active' : ''}`} 
+          onClick={() => setSearchTerm('regular')}
+        >
+          {isMaintenance ? 'Maintenance' : 'Regular Service'} ({recordCounts.regular})
+        </button>
+      </div>
+
+      <div className="controls-bar">
         <div className="search-container">
           <input
             type="text"
-            placeholder={isMaintenance ? "Search maintanance history..." : "Search service history..."}
+            placeholder={isMaintenance ? "Search maintenance history..." : "Search service history..."}
             value={searchTerm}
             onChange={handleSearchChange}
             className="search-input"
           />
           {searchTerm && (
-            <button onClick={handleClearSearch} className="clear-button">
-              ×
-            </button>
+            <button onClick={handleClearSearch} className="clear-btn">×</button>
           )}
         </div>
         <div className="action-buttons">
-          <button onClick={handleAddService} className="add-button">
-            Add {isMaintenance ? 'Maintanance' : 'Service'}
+          <button onClick={handleAddService} className="action-btn add">
+            Add {isMaintenance ? 'Maintenance' : 'Service'}
           </button>
-          <button onClick={handleToggleView} className="maintance-history">
-            Show {isMaintenance ? 'Periodic History' : 'Maintanance History'}
+          <button onClick={handleToggleView} className="action-btn toggle">
+            {isMaintenance ? 'Service' : 'Maintenance'} History
           </button>
-          <button onClick={showTyreService} className="maintance-history-tyre">
-            Show Tyre Sevice
+          <button onClick={showTyreService} className="action-btn tyre">
+            Tyre / Battery History
           </button>
-          <button onClick={handlePrint} className="print-button">
-            Print Table
+          <button onClick={handlePrint} className="action-btn print">
+            Print
           </button>
         </div>
       </div>
-      <div className="table-info">
-        {searchTerm ? (
-          `Found ${filteredData.length} matching ${filteredData.length === 1 ? 'entry' : 'entries'}`
-        ) : (
-          `Showing ${filteredData.length} ${filteredData.length === 1 ? 'entry' : 'entries'} `
-        )}
-      </div>
 
-      <div className="table-container">
-        <table className="equipment-table" ref={tableRef}>
-          <thead>
-            <tr>
-              {isMaintenance ? (
-                <>
-                  <th>Date</th>
-                  <th>Equipment No</th>
-                  <th style={{ width: '80%' }}>Work Remarks</th>
-                </>
-              ) : (
-                <>
-                  <th className='date-th'>Date</th>
-                  <th>Oil</th>
-                  <th>Oil Filter</th>
-                  <th>Fuel Filter</th>
-                  <th>Water Separator</th>
-                  <th>Air Filter</th>
-                  <th className='service-th'>Serviced Hrs</th>
-                  <th className='date-th'>Next Service Hrs</th>
-                  <th className='next-f-th'>Next Full Service Hrs</th>
-                  <th>Work Remarks</th>
-                </>
-              )}
-            </tr>
-          </thead>
-          <tbody>
-            {filteredData.length > 0 ? (
-              filteredData.map((item, index) => (
-                <tr 
-                  key={index}
-                  onClick={() => handleRowClick(formatDate(item.date))}
-                  className={`doc-click ${item.fullService ? 'full-service-row' : ''}`}
-                >
-                  <td>{formatDate(item.date)}</td>
-                  { isMaintenance ?   <td style={{ textAlign: 'left' }}>{item.regNo}</td> : ""}
-                  {isMaintenance ? (
-                    <td style={{ textAlign: 'left' }}>{item.workRemarks}</td>
-                  ) : (
-                    <>
-                      <td>{item.oil}</td>
-                      <td>{item.oilFilter}</td>
-                      <td>{item.fuelFilter}</td>
-                      <td>{item.waterSeparator}</td>
-                      <td>{item.airFilter}</td>
-                      <td>{item.serviceHrs}</td>
-                      {item.nextServiceHrs === 0 ? ' ' : <td>{item.nextServiceHrs}</td> }
-                     { item.fullService ?  <td>{item.serviceHrs + 3000}</td> :  <td></td>}
-                     { item.fullService ?  <td>{item.remarks}</td> :  <td></td>}
-                    </>
-                  )}
-                </tr>
-              ))
-            ) : (
+      {loading ? (
+        <div className="loading">Loading service history data...</div>
+      ) : error ? (
+        <div className="error-message">{error}</div>
+      ) : (
+        <div className="service-table-container">
+          <table className="service-table" ref={tableRef}>
+            <thead>
               <tr>
-                <td colSpan={isMaintenance ? "3" : "10"} className="no-results">
-                  No {isMaintenance ? 'maintenance' : 'service history'} records found for this equipment
-                </td>
+                {isMaintenance ? (
+                  <>
+                    <th>Date</th>
+                    <th>Equipment No</th>
+                    <th>Work Remarks</th>
+                    <th>Document</th>
+                  </>
+                ) : (
+                  <>
+                    <th>Date</th>
+                    <th>Oil</th>
+                    <th>Oil Filter</th>
+                    <th>Fuel Filter</th>
+                    <th>Water Separator</th>
+                    <th>Air Filter</th>
+                    <th>Service Hrs</th>
+                    <th>Next Service Hrs</th>
+                    <th>Next Full Service</th>
+                    <th>Remarks</th>
+                    <th>Document</th>
+                  </>
+                )}
               </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
+            </thead>
+            <tbody>
+              {filteredData.length > 0 ? (
+                filteredData.map((item, index) => (
+                  <tr 
+                    key={index}
+                    className={`${item.fullService ? 'full-service-row' : ''}`}
+                  >
+                    <td>{formatDate(item.date)}</td>
+                    {isMaintenance ? (
+                      <>
+                        <td>{item.regNo}</td>
+                        <td style={{ textAlign: 'left' }}>{item.workRemarks}</td>
+                      </>
+                    ) : (
+                      <>
+                        <td>{item.oil}</td>
+                        <td>{item.oilFilter}</td>
+                        <td>{item.fuelFilter}</td>
+                        <td>{item.waterSeparator}</td>
+                        <td>{item.airFilter}</td>
+                        <td>{item.serviceHrs}</td>
+                        <td>{item.nextServiceHrs === 0 ? '' : item.nextServiceHrs}</td>
+                        <td>{item.fullService ? (item.serviceHrs + 3000) : ''}</td>
+                        <td style={{ textAlign: 'left' }}>{item.remarks || ''}</td>
+                      </>
+                    )}
+                    <td>
+                      <button 
+                        className="action-btn details" 
+                        onClick={() => handleRowClick(formatDate(item.date))}
+                      >
+                        View Document
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan={isMaintenance ? "4" : "11"} className="no-results">
+                    No {isMaintenance ? 'maintenance' : 'service history'} records found
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
   );
-}
+};
 
 export default ServiceHistory;

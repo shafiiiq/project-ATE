@@ -1,9 +1,26 @@
 /* Table.css */
 
+:root {
+    --primary-color: #3498db;
+    --idle-color: #2ecc71;
+    --committed-color: #3498db;
+    --maintenance-color: #e74c3c;
+    --full-service-color: #f39c12;
+    --regular-color: #2980b9;
+    --bg-color: #f5f7fa;
+    --card-bg: #ffffff;
+    --text-color: #333333;
+    --border-color: #e1e4e8;
+    --hover-bg: #f0f5ff;
+    --disabled-bg: #e9ecef;
+    --disabled-text: #6c757d;
+}
+
+
 .container {
-    max-width: 1593px;
+    max-width: 100%;
     margin: 0 auto;
-    padding: 20px;
+    padding: 20px 0;
 }
 
 .title {
@@ -30,7 +47,7 @@
 .search-container {
     position: relative;
     flex: 1;
-    max-width: 400px;
+    max-width: 100%;
 }
 
 .search-input {
@@ -44,8 +61,8 @@
 
 .search-input:focus {
     outline: none;
-    border-color: #4CAF50;
-    box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
+    border-color: var(--regular-color);
+    box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
 }
 
 .clear-button {

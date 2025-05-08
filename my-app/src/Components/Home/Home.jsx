@@ -4,12 +4,18 @@ import Jcb from '../../assets/images/jcb.png';
 import { Link } from 'react-router-dom';
 import "./Home.css"
 
-
 function Home() {
     return (
         <div className="dashboard-container">
             {/* Left Sidebar */}
             <aside className="sidebar">
+                {/* Animated background shapes for sidebar */}
+                <div className="sidebar-background">
+                    <div className="sidebar-shape sidebar-shape-1"></div>
+                    <div className="sidebar-shape sidebar-shape-2"></div>
+                    <div className="sidebar-shape sidebar-shape-3"></div>
+                </div>
+
                 <div className="logo-container">
                     <img src={logoImage} alt="Company Logo" className="logo" />
                 </div>
@@ -19,7 +25,7 @@ function Home() {
                         <li className="active"><Link to="/">Home</Link></li>
                         <li><Link to="/equipments">Equipements Inventory</Link></li>
                         <li><Link to="/stocks">Stocks Inventory</Link></li>
-                        <li><Link to="/service-form">Periodic Service Reports</Link></li>
+                        <li><Link to="/equipment-updates">Equipments Updates</Link></li>
                         <li><a href="#clients">LPO For Quatation</a></li>
                         <li><a href="/">Tyre Changing Reports</a></li>
                         <li><a href="#reports">Reports</a></li>

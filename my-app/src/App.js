@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import { useState, createContext } from 'react';
 import Home from './Components/Home/Home';
 import ServiceDoc from './Components/ServiceDoc/ServiceDoc';
@@ -15,9 +15,16 @@ import MaintanceHistoryForm from './Components/MaintanceHistoryForm/MaintanceHis
 import EquipmentStockForm from './Components/EquipmentStockForm/EquipmentStockForm';
 import EquipmentStocks from './Components/EquipmentStocks/EquipmentStocks';
 import EquipmentUpdate from './Components/EquipmentUpdate/EquipmentUpdate';
+import Header from './Components/Common/Header/Header';
 
 // Create a context to share service report data between components
 export const ServiceReportContext = createContext();
+
+function HeaderWrapper() {
+  const location = useLocation();
+  const hideHeader = location.pathname === '/' || location.pathname.startsWith('/service-doc');
+  return !hideHeader && <Header />;
+}
 
 function App() {
   // State to store the service report data
@@ -26,6 +33,7 @@ function App() {
   return (
     <ServiceReportContext.Provider value={{ serviceReportData, setServiceReportData }}>
       <Router>
+        <HeaderWrapper />
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/service-doc" element={<ServiceDoc />} />
@@ -43,8 +51,8 @@ function App() {
           <Route path="/tyre-history-form/:regNo" element={<TyreHistoryForm />} />
           <Route path="/maintenance-history-form/:regNo" element={<MaintanceHistoryForm />} />
           <Route path="/stocks" element={<StocksNavigation />} />
-          <Route path="/stocks/eqipment-part-stocks" element={<Stocks />} />
-          <Route path="/stocks/eqipment-stocks" element={<EquipmentStocks />} />
+          <Route path="/stocks/equipment-part-stocks" element={<Stocks />} />
+          <Route path="/stocks/equipment-stocks" element={<EquipmentStocks />} />
           <Route path="/equipment-stocks-form" element={<EquipmentStockForm />} />
           <Route path="/equipment-updates" element={<EquipmentUpdate />} />
         </Routes>

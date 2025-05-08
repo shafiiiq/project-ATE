@@ -1,181 +1,418 @@
 import React, { useState, useEffect } from 'react';
-import './EquipmentUpdate.css';
+import '../EquipmentUpdate/EquipmentUpdate.css';
 
 const EquipmentUpdate = () => {
-  const [currentDateTime, setCurrentDateTime] = useState(new Date());
-  const [searchTerm, setSearchTerm] = useState('');
-  
-  // Update time every second
+  const [equipmentData, setEquipmentData] = useState([]);
+  const [filter, setFilter] = useState('all');
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [selectedEquipment, setSelectedEquipment] = useState(null);
+  const [currentDateTime, setCurrentDateTime] = useState('');
+
+  // Temporary API URLs - replace these with your actual endpoints
+  const API_URLS = {
+    fetchEquipment: 'https://api.example.com/equipment',
+    updateStatus: 'https://api.example.com/equipment/status'
+  };
+
+  // Get current date in DD-MM-YY format and time in AM/PM format
   useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentDateTime(new Date());
-    }, 1000);
+    const updateDateTime = () => {
+      const now = new Date();
+      
+      // Format date as DD-MM-YY
+      const day = String(now.getDate()).padStart(2, '0');
+      const month = String(now.getMonth() + 1).padStart(2, '0');
+      const year = String(now.getFullYear()).slice(-2);
+      const dateString = `${day}-${month}-${year}`;
+      
+      // Format time in AM/PM
+      let hours = now.getHours();
+      const minutes = String(now.getMinutes()).padStart(2, '0');
+      const ampm = hours >= 12 ? 'PM' : 'AM';
+      hours = hours % 12;
+      hours = hours ? hours : 12; // Convert 0 to 12
+      const timeString = `${hours}:${minutes} ${ampm}`;
+      
+      setCurrentDateTime(`${dateString}   |   ${timeString}`);
+    };
+
+    updateDateTime();
+    const interval = setInterval(updateDateTime, 60000); // Update every minute
     
-    return () => clearInterval(timer);
+    return () => clearInterval(interval);
   }, []);
-  
-  // Format date as DD-MM-YYYY
-  const formattedDate = `${currentDateTime.getDate().toString().padStart(2, '0')}-${
-    (currentDateTime.getMonth() + 1).toString().padStart(2, '0')}-${
-    currentDateTime.getFullYear()}`;
-    
-  // Format time as HH:MM:SS AM/PM
-  const formattedTime = currentDateTime.toLocaleTimeString('en-US', { 
-    hour: '2-digit', 
-    minute: '2-digit', 
-    second: '2-digit', 
-    hour12: true 
-  });
-  
-  // Handle print functionality
-  const handlePrint = () => {
-    window.print();
+
+  // Fetch equipment data
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        // In a real implementation, uncomment the following:
+        // const response = await fetch(API_URLS.fetchEquipment);
+        // const data = await response.json();
+        // setEquipmentData(data);
+        
+        // For now, use the sample data
+        setTimeout(() => {
+          setEquipmentData([
+            {
+              "id": "1",
+              "machine": "80 Ton Mobile Crane",
+              "brand": "ZOOMLION",
+              "regNo": "78862",
+              "status": "committed"
+            },
+            {
+              "id": "2",
+              "machine": "80 Ton Mobile Crane",
+              "brand": "ZOOMLION",
+              "regNo": "78863",
+              "status": "committed"
+            },
+            {
+              "id": "3",
+              "machine": "Dumptruck",
+              "brand": "SINOTRUK",
+              "regNo": "281998",
+              "status": "committed"
+            },
+            {
+              "id": "4",
+              "machine": "3 Ton Boom Truck",
+              "brand": "MISTUBISHI",
+              "regNo": "239500",
+              "status": "idle"
+            },
+            {
+              "id": "5",
+              "machine": "Mini Dumptruck",
+              "brand": "ISUZU",
+              "regNo": "198331",
+              "status": "idle"
+            },
+            {
+              "id": "6",
+              "machine": "3 Ton Roller",
+              "brand": "BOMAG",
+              "regNo": "70770",
+              "status": "maintenance"
+            },
+            {
+              "id": "7",
+              "machine": "3 Ton Roller",
+              "brand": "BOMAG",
+              "regNo": "70760",
+              "status": "maintenance"
+            },
+            {
+              "id": "8",
+              "machine": "3 Ton Forklift",
+              "brand": "LONKING",
+              "regNo": "72870",
+              "status": "idle"
+            },
+            {
+              "id": "9",
+              "machine": "3 Ton Forklift",
+              "brand": "LONKING",
+              "regNo": "72871",
+              "status": "idle"
+            },
+            {
+              "id": "10",
+              "machine": "3 Ton Forklift",
+              "brand": "HELI",
+              "regNo": "43097",
+              "status": "maintenance"
+            },
+            {
+              "id": "11",
+              "machine": "3 Ton Forklift",
+              "brand": "HELI",
+              "regNo": "70579",
+              "status": "maintenance"
+            },
+            {
+              "id": "12",
+              "machine": "5 Ton Forklift",
+              "brand": "ZOOMLION",
+              "regNo": "72484",
+              "status": "maintenance"
+            },
+            {
+              "id": "13",
+              "machine": "5 Ton Forklift",
+              "brand": "TCM",
+              "regNo": "15050",
+              "status": "idle"
+            },
+            {
+              "id": "14",
+              "machine": "7 Ton Forklift",
+              "brand": "HELI",
+              "regNo": "36707",
+              "status": "idle"
+            },
+            {
+              "id": "15",
+              "machine": "Skid Loader",
+              "brand": "JCB",
+              "regNo": "54470",
+              "status": "idle"
+            },
+            {
+              "id": "16",
+              "machine": "Backhoe Loader",
+              "brand": "CASE",
+              "regNo": "67823",
+              "status": "idle"
+            },
+            {
+              "id": "17",
+              "machine": "Wheel Loader",
+              "brand": "LUIGONG",
+              "regNo": "71056",
+              "status": "maintenance"
+            },
+            {
+              "id": "18",
+              "machine": "Wheel Loader",
+              "brand": "LUIGONG",
+              "regNo": "70126",
+              "status": "idle"
+            },
+            {
+              "id": "19",
+              "machine": "20 Ton Wheel Excavator",
+              "brand": "HYUNDAI",
+              "regNo": "68978",
+              "status": "maintenance"
+            },
+            {
+              "id": "20",
+              "machine": "20 Ton Wheel Excavator",
+              "brand": "HYUNDAI",
+              "regNo": "46941",
+              "status": "idle"
+            },
+            {
+              "id": "21",
+              "machine": "30 Ton Mobile Crane",
+              "brand": "SANY",
+              "regNo": "68154",
+              "status": "idle"
+            },
+            {
+              "id": "22",
+              "machine": "10 Ton Roller",
+              "brand": "BOMAG",
+              "regNo": "43711",
+              "status": "idle"
+            }
+          ]);
+          setLoading(false);
+        }, 500); // Simulate network delay
+      } catch (err) {
+        setError('Failed to fetch equipment data');
+        setLoading(false);
+        console.error('Error fetching equipment data:', err);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  // Count equipment by status
+  const statusCounts = {
+    all: equipmentData.length,
+    idle: equipmentData.filter(item => item.status === 'idle').length,
+    committed: equipmentData.filter(item => item.status === 'committed').length,
+    maintenance: equipmentData.filter(item => item.status === 'maintenance').length
   };
-  
-  // Handle search input change
-  const handleSearchChange = (e) => {
-    setSearchTerm(e.target.value);
+
+  // Filter data based on selected filter
+  const filteredData = filter === 'all' 
+    ? equipmentData 
+    : equipmentData.filter(item => item.status === filter);
+
+  // Update equipment status
+  const updateStatus = async (equipmentId, newStatus) => {
+    try {
+      // In a real implementation, uncomment the following:
+      // const response = await fetch(API_URLS.updateStatus, {
+      //   method: 'PUT',
+      //   headers: {
+      //     'Content-Type': 'application/json',
+      //   },
+      //   body: JSON.stringify({ id: equipmentId, status: newStatus }),
+      // });
+      // 
+      // if (!response.ok) {
+      //   throw new Error('Network response was not ok');
+      // }
+      // 
+      // const updatedEquipment = await response.json();
+
+      // For now, update the local state directly
+      const updatedData = equipmentData.map(item => 
+        item.id === equipmentId ? { ...item, status: newStatus } : item
+      );
+      
+      setEquipmentData(updatedData);
+      setSelectedEquipment(null); // Close details panel after update
+      
+      alert(`Equipment ID ${equipmentId} status updated to ${newStatus}`);
+    } catch (err) {
+      console.error('Error updating equipment status:', err);
+      alert('Failed to update equipment status');
+    }
   };
 
-  // Equipment data from the PDF
-  const equipmentData = [
-    { sl: 1, machine: "80 Ton Mobile Crane", brand: "ZOOMLION", regNo: "78862", status: "Committed to Samsung (Ras Laffan)" },
-    { sl: 2, machine: "80 Ton Mobile Crane", brand: "ZOOMLION", regNo: "78863", status: "Committed to Samsung (Ras Laffan)" },
-    { sl: 3, machine: "Dumptruck", brand: "SINOTRUK", regNo: "281998", status: "Committed to QCON" },
-    { sl: 1, machine: "3 Ton Boom Truck", brand: "MISTUBISHI", regNo: "239500", status: "Idle/ Ready for work" },
-    { sl: 2, machine: "Mini Dumptruck", brand: "ISUZU", regNo: "198331", status: "Idle/ Ready for work" },
-    { sl: 3, machine: "3 Ton Roller", brand: "BOMAG", regNo: "70770", status: "Idle/ Need to check" },
-    { sl: 4, machine: "3 Ton Roller", brand: "BOMAG", regNo: "70760", status: "Idle/ Need to check" },
-    { sl: 5, machine: "3 Ton Forklift", brand: "LONKING", regNo: "72870", status: "Idle/ Ready for work" },
-    { sl: 6, machine: "3 Ton Forklift", brand: "LONKING", regNo: "72871", status: "Idle/ Ready for work" },
-    { sl: 7, machine: "3 Ton Forklift", brand: "HELI", regNo: "43097", status: "Idle/ Need to check" },
-    { sl: 8, machine: "3 Ton Forklift", brand: "HELI", regNo: "70579", status: "Idle/ Need to check" },
-    { sl: 9, machine: "5 Ton Forklift", brand: "ZOOMLION", regNo: "72484", status: "Idle/ Need to check" },
-    { sl: 10, machine: "5 Ton Forklift", brand: "TCM", regNo: "15050", status: "Idle/ Ready for work" },
-    { sl: 11, machine: "7 Ton Forklift", brand: "HELI", regNo: "36707", status: "Idle/ Ready for work" },
-    { sl: 12, machine: "Skid Loader", brand: "JCB", regNo: "54470", status: "Idle/ Ready for work" },
-    { sl: 13, machine: "Backhoe Loader", brand: "CASE", regNo: "67823", status: "Idle/ Ready for work" },
-    { sl: 14, machine: "Wheel Loader", brand: "LUIGONG", regNo: "71056", status: "Idle/ Need to check" },
-    { sl: 15, machine: "Wheel Loader", brand: "LUIGONG", regNo: "70126", status: "Idle/ Ready for work" },
-    { sl: 16, machine: "20 Ton Wheel Excavator", brand: "HYUNDAI", regNo: "68978", status: "Idle/ Need to check" },
-    { sl: 17, machine: "20 Ton Wheel Excavator", brand: "HYUNDAI", regNo: "46941", status: "Idle/ Ready for work" },
-    { sl: 18, machine: "30 Ton Mobile Crane", brand: "SANY", regNo: "68154", status: "Idle/ Ready for work" },
-    { sl: 19, machine: "10 Ton Roller", brand: "BOMAG", regNo: "43711", status: "Idle/ Ready for work" },
-  ];
-
-  // Separate committed and idle equipment
-  const committedEquipment = equipmentData.filter(item => 
-    item.status.startsWith("Committed")
-  );
-  
-  const idleEquipment = equipmentData.filter(item => 
-    item.status.startsWith("Idle")
-  );
-
-  // Filter equipment based on search term
-  const filteredEquipmentData = equipmentData.filter(item =>
-    Object.values(item).some(value => 
-      value.toString().toLowerCase().includes(searchTerm.toLowerCase())
-    )
-  );
-  
-  // Re-separate filtered data
-  const filteredCommittedEquipment = filteredEquipmentData.filter(item => 
-    item.status.startsWith("Committed")
-  );
-  
-  const filteredIdleEquipment = filteredEquipmentData.filter(item => 
-    item.status.startsWith("Idle")
-  );
+  // Show equipment details
+  const showDetails = (equipment) => {
+    setSelectedEquipment(equipment);
+  };
 
   return (
-    <div className="equipment-update" data-print-date={`${formattedDate} ${formattedTime}`}>
-      <div className="header-section">
-        <h1>EQUIPMENTS LIST</h1>
-        <div className="datetime-container">
-          <div className="date">{formattedDate}</div>
-          <div className="animated-time">{formattedTime}</div>
-        </div>
+    <div className="equipment-update-container">
+      <div className="equipment-header">
+        <h1 className='equip-updates'>Equipment Updates</h1>
+        <div className="date-time">{currentDateTime}</div>
       </div>
       
-      <div className="controls-section">
-        <div className="search-container">
-          <input 
-            type="text" 
-            placeholder="Search equipment..." 
-            value={searchTerm}
-            onChange={handleSearchChange}
-            className="search-input"
-          />
-        </div>
-        <button onClick={handlePrint} className="print-button">
-          Print Equipment List
+      <div className="filter-buttons">
+        <button 
+          className={`filter-btn ${filter === 'all' ? 'active' : ''}`} 
+          onClick={() => setFilter('all')}
+        >
+          All ({statusCounts.all})
+        </button>
+        <button 
+          className={`filter-btn idle ${filter === 'idle' ? 'active' : ''}`} 
+          onClick={() => setFilter('idle')}
+        >
+          Idle ({statusCounts.idle})
+        </button>
+        <button 
+          className={`filter-btn committed ${filter === 'committed' ? 'active' : ''}`} 
+          onClick={() => setFilter('committed')}
+        >
+          Committed ({statusCounts.committed})
+        </button>
+        <button 
+          className={`filter-btn maintenance ${filter === 'maintenance' ? 'active' : ''}`} 
+          onClick={() => setFilter('maintenance')}
+        >
+          Maintenance ({statusCounts.maintenance})
         </button>
       </div>
-      
-      <div className="section">
-        <h3 className='committed'>COMMITTED EQUIPMENTS</h3>
-        <table>
-          <thead>
-            <tr>
-              <th>SL</th>
-              <th>MACHINE</th>
-              <th>BRAND</th>
-              <th>REG NO</th>
-              <th>STATUS</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredCommittedEquipment.length > 0 ? (
-              filteredCommittedEquipment.map((item, index) => (
-                <tr key={`committed-${index}`}>
-                  <td>{item.sl}</td>
-                  <td>{item.machine}</td>
-                  <td>{item.brand}</td>
-                  <td>{item.regNo}</td>
-                  <td>{item.status}</td>
-                </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan="5" className="no-results">No matching committed equipment found</td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
 
-      <div className="section">
-        <h3 className='idle'>IDLE EQUIPMENTS</h3>
-        <table>
-          <thead>
-            <tr>
-              <th>SL</th>
-              <th>MACHINE</th>
-              <th>BRAND</th>
-              <th>REG NO</th>
-              <th>STATUS</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredIdleEquipment.length > 0 ? (
-              filteredIdleEquipment.map((item, index) => (
-                <tr key={`idle-${index}`}>
-                  <td>{item.sl}</td>
+      {loading ? (
+        <div className="loading">Loading equipment data...</div>
+      ) : error ? (
+        <div className="error-message">{error}</div>
+      ) : (
+        <div className="equipment-table-container">
+          <table className="equipment-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Machine</th>
+                <th>Brand</th>
+                <th>Reg No</th>
+                <th>Site</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredData.map((item) => (
+                <tr key={item.id}>
+                  <td>{item.id}</td>
                   <td>{item.machine}</td>
                   <td>{item.brand}</td>
                   <td>{item.regNo}</td>
-                  <td>{item.status}</td>
+                  {item.status === 'committed' ? <td>Raslaffan</td>: <td> </td>}
+                  <td>
+                    <span className={`status-badge ${item.status}`}>
+                      {item.status.charAt(0).toUpperCase() + item.status.slice(1)}
+                    </span>
+                  </td>
+                  <td>
+                    <button 
+                      className="action-btn details" 
+                      onClick={() => showDetails(item)}
+                    >
+                      Status change
+                    </button>
+                  </td>
                 </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan="5" className="no-results">No matching idle equipment found</td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      {selectedEquipment && (
+        <div className="equipment-details">
+          <div className="details-header">
+            <h2>Equipment Details</h2>
+            <button className="close-btn" onClick={() => setSelectedEquipment(null)}>×</button>
+          </div>
+          <div className="details-content">
+            <div className="detail-item">
+              <span className="label">ID:</span>
+              <span className="value">{selectedEquipment.id}</span>
+            </div>
+            <div className="detail-item">
+              <span className="label">Machine:</span>
+              <span className="value">{selectedEquipment.machine}</span>
+            </div>
+            <div className="detail-item">
+              <span className="label">Brand:</span>
+              <span className="value">{selectedEquipment.brand}</span>
+            </div>
+            <div className="detail-item">
+              <span className="label">Registration Number:</span>
+              <span className="value">{selectedEquipment.regNo}</span>
+            </div>
+            <div className="detail-item">
+              <span className="label">Current Status:</span>
+              <span className={`value status-badge ${selectedEquipment.status}`}>
+                {selectedEquipment.status.charAt(0).toUpperCase() + selectedEquipment.status.slice(1)}
+              </span>
+            </div>
+            
+            <div className="status-update-buttons">
+              <h3>Update Status</h3>
+              <div className="status-btn-group">
+                <button 
+                  className="status-btn idle" 
+                  onClick={() => updateStatus(selectedEquipment.id, 'idle')}
+                  disabled={selectedEquipment.status === 'idle'}
+                >
+                  Set to Idle
+                </button>
+                <button 
+                  className="status-btn committed" 
+                  onClick={() => updateStatus(selectedEquipment.id, 'committed')}
+                  disabled={selectedEquipment.status === 'committed'}
+                >
+                  Set to Committed
+                </button>
+                <button 
+                  className="status-btn maintenance" 
+                  onClick={() => updateStatus(selectedEquipment.id, 'maintenance')}
+                  disabled={selectedEquipment.status === 'maintenance'}
+                >
+                  Set to Maintenance
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

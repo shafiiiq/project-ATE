@@ -80,7 +80,7 @@ const ServiceDoc = () => {
   return (
     <>
       <div className="print-button-wrapper no-print">
-        <button onClick={handlePrint}>🖨️ Print Report</button>
+        <button onClick={handlePrint}>Print Report</button>
       </div>
       <div className="report-container">
         <div className="header">

@@ -121,15 +121,17 @@ body {
   padding: 8px 16px;
   font-size: 14px;
   cursor: pointer;
-  background-color: #2e7d32;
-  color: white;
+  background-color: var(--committed-color);
+  color: var(--card-bg);
   border: none;
   border-radius: 4px;
   transition: background-color 0.3s;
+  font-weight: 400;
+  width: 100%;
 }
 
 .print-button-wrapper button:hover {
-  background-color: #1b5e20;
+  background-color: rgb(24, 110, 167);
 }
 
 .company-name-s {
